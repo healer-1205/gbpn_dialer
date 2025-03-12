@@ -50,7 +50,8 @@ class _DialpadScreenState extends State<DialpadScreen> {
       await TwilioVoice.instance.requestReadPhoneNumbersPermission();
       await TwilioVoice.instance.registerPhoneAccount();
       await TwilioVoice.instance.openPhoneAccountSettings();
-      bool _isPhoneAccountEnabled = await TwilioVoice.instance.isPhoneAccountEnabled();
+      bool _isPhoneAccountEnabled =
+          await TwilioVoice.instance.isPhoneAccountEnabled();
 
       if (_isPhoneAccountEnabled) {
         TwilioVoice.instance.requestCallPhonePermission();
@@ -122,13 +123,6 @@ class _DialpadScreenState extends State<DialpadScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "GBPN Dialer",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
               _buildNumberDisplay(),
               _buildDialpad(),
               _buildActionButtons(),
@@ -294,42 +288,6 @@ class _DialpadScreenState extends State<DialpadScreen> {
           size: 32,
         ),
       ),
-    );
-  }
-
-  Widget _buildBottomNavigation() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey, width: 0.5)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem("Keypad", true),
-          _buildNavItem("Recents", false),
-          _buildNavItem("Contacts", false),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(String text, bool isSelected) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(text,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.black : Colors.grey)),
-        if (isSelected)
-          Container(
-              width: 40,
-              height: 2,
-              color: Colors.black,
-              margin: const EdgeInsets.only(top: 4)),
-      ],
     );
   }
 
