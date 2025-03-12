@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:gbpn_dealer/utils/extension.dart';
 
 class DialpadScreen extends StatefulWidget {
@@ -13,11 +14,14 @@ class _DialpadScreenState extends State<DialpadScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
+  final StorageService _storageService = StorageService();
+  String _twilioAccessToken = "";
 
   @override
   void initState() {
     super.initState();
     _controller.text = "";
+    _getTwilioAccessToken();
   }
 
   @override
@@ -25,6 +29,11 @@ class _DialpadScreenState extends State<DialpadScreen> {
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _getTwilioAccessToken() async {
+    String? twilioAccessToken = await _storageService.getTwilioAccessToken();
+    setState(() => _twilioAccessToken = twilioAccessToken!);
   }
 
   void _onNumberPressed(String number) {
@@ -220,7 +229,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
   Widget _buildCallButton() {
     return GestureDetector(
       onTap: () {
-        // TODO: Implement call functionality
+        print("twilioAccessToken: ${_twilioAccessToken}");
       },
       child: Container(
         height: context.screenWidth / 5.5,
