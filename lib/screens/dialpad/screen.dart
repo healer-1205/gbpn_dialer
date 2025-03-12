@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:gbpn_dealer/utils/extension.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DialpadScreen extends StatefulWidget {
   const DialpadScreen({super.key});
@@ -16,12 +17,14 @@ class _DialpadScreenState extends State<DialpadScreen> {
   final FocusNode _focusNode = FocusNode();
   final StorageService _storageService = StorageService();
   String _twilioAccessToken = "";
+  final platform = MethodChannel('twilio_voice');
 
   @override
   void initState() {
     super.initState();
     _controller.text = "";
     _getTwilioAccessToken();
+    requestPermissions();
   }
 
   @override
@@ -31,9 +34,32 @@ class _DialpadScreenState extends State<DialpadScreen> {
     super.dispose();
   }
 
+  Future<void> requestPermissions() async {
+    await Permission.microphone.request();
+    await Permission.phone.request();
+  }
+
   Future<void> _getTwilioAccessToken() async {
     String? twilioAccessToken = await _storageService.getTwilioAccessToken();
     setState(() => _twilioAccessToken = twilioAccessToken!);
+  }
+
+  Future<void> _makeCall(String token, String to) async {
+    try {
+      print("twilio token: ${token}");
+      final result = await platform
+          .invokeMethod('makeCall', {"token": token, "to": "+15093611979"});
+
+      print("Call Status: $result");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Call Status: $result")),
+      );
+    } on PlatformException catch (e) {
+      print("Failed to make call: '${e.message}'.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Call failed: ${e.message}")),
+      );
+    }
   }
 
   void _onNumberPressed(String number) {
@@ -228,8 +254,15 @@ class _DialpadScreenState extends State<DialpadScreen> {
 
   Widget _buildCallButton() {
     return GestureDetector(
-      onTap: () {
-        print("twilioAccessToken: ${_twilioAccessToken}");
+      onTap: () async {
+        if (_twilioAccessToken.isNotEmpty && _controller.text.isNotEmpty) {
+          await _makeCall(_twilioAccessToken, _controller.text);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text("Enter a valid number and ensure token exists")),
+          );
+        }
       },
       child: Container(
         height: context.screenWidth / 5.5,
