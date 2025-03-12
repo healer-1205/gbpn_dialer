@@ -38,7 +38,8 @@ class _SignInScreenState extends State<SignInScreen> {
     if (success == null) {
       await _hideKeyboard(context);
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/dialpad');
+        // Navigator.pushReplacementNamed(context, '/dialpad');
+        Navigator.pushReplacementNamed(context, '/main');
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

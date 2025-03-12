@@ -130,7 +130,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
           //   ],
           // ),
           ),
-      bottomNavigationBar: _buildBottomNavigation(),
+      // bottomNavigationBar: _buildBottomNavigation(),
     );
   }
 
