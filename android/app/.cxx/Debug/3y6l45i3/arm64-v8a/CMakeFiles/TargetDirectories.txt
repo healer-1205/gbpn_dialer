@@ -1,2 +1,0 @@
-D:/my_projects/gbpn_dialer/android/app/.cxx/Debug/3y6l45i3/arm64-v8a/CMakeFiles/edit_cache.dir
-D:/my_projects/gbpn_dialer/android/app/.cxx/Debug/3y6l45i3/arm64-v8a/CMakeFiles/rebuild_cache.dir

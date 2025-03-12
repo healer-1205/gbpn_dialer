@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:gbpn_dealer/utils/extension.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:twilio_voice/twilio_voice.dart';
 
 class DialpadScreen extends StatefulWidget {
   const DialpadScreen({super.key});
@@ -46,16 +47,15 @@ class _DialpadScreenState extends State<DialpadScreen> {
 
   Future<void> _makeCall(String token, String to) async {
     try {
-      print("twilio token: ${token}");
-      final result = await platform
-          .invokeMethod('makeCall', {"token": token, "to": "+15093611979"});
+      await TwilioVoice.instance.requestReadPhoneNumbersPermission();
+      await TwilioVoice.instance.registerPhoneAccount();
+      await TwilioVoice.instance.openPhoneAccountSettings();
+      bool _isPhoneAccountEnabled = await TwilioVoice.instance.isPhoneAccountEnabled();
 
-      print("Call Status: $result");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Call Status: $result")),
-      );
+      if (_isPhoneAccountEnabled) {
+        TwilioVoice.instance.requestCallPhonePermission();
+      }
     } on PlatformException catch (e) {
-      print("Failed to make call: '${e.message}'.");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Call failed: ${e.message}")),
       );
