@@ -50,10 +50,10 @@ class _DialpadScreenState extends State<DialpadScreen> {
       await TwilioVoice.instance.requestReadPhoneNumbersPermission();
       await TwilioVoice.instance.registerPhoneAccount();
       await TwilioVoice.instance.openPhoneAccountSettings();
-      bool _isPhoneAccountEnabled =
+      bool isPhoneAccountEnabled =
           await TwilioVoice.instance.isPhoneAccountEnabled();
 
-      if (_isPhoneAccountEnabled) {
+      if (isPhoneAccountEnabled) {
         TwilioVoice.instance.requestCallPhonePermission();
       }
     } on PlatformException catch (e) {
