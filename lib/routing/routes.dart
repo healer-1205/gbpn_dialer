@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../screens/dialpad/dialer_screen.dart';
 import '../screens/intro/screen.dart';
 import '../screens/main_screen/main_screen_view.dart';
 import '../screens/signin/screen.dart';
-import '../screens/dialpad/screen.dart';
 import '../screens/splash/screen.dart';
 
 class Routes {

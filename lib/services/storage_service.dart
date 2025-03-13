@@ -30,4 +30,14 @@ class StorageService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('twilio_access_token');
   }
+
+  Future<void> saveFCMToken(String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fcm_token', token);
+  }
+
+  Future<String?> getFCMToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('fcm_token');
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../contacts/contact_screen.dart';
-import '../dialpad/screen.dart';
+import '../dialpad/dialer_screen.dart';
 import '../recent/recent_screen.dart';
 
 class MainScreenView extends StatefulWidget {
