@@ -20,10 +20,34 @@ class TwilioService {
         accessToken: accessToken,
         deviceToken: deviceToken,
       );
+
+      bool hasAccount = await TwilioVoice.instance.hasRegisteredPhoneAccount();
+      if (!hasAccount) {
+        print("⚠️ No Phone Account Registered! Registering now...");
+        await _registerPhoneAccount();
+      }
+      // 🔹 Add delay to ensure registration completes
+      await Future.delayed(Duration(seconds: 2));
+
       _setupListeners();
       print("Twilio Initialized Successfully");
     } catch (e) {
       print("Twilio Initialization Failed: $e");
+    }
+  }
+
+  Future<void> _registerPhoneAccount() async {
+    try {
+      bool? isRegistered = await TwilioVoice.instance.registerPhoneAccount();
+      if (isRegistered!) {
+        print("✅ Phone Account Registered Successfully");
+        // ⏳ Delay before making a call (Allow time for registration)
+        await Future.delayed(Duration(seconds: 2));
+      } else {
+        print("⚠️ Failed to Register Phone Account");
+      }
+    } catch (e) {
+      print("❌ Error Registering Phone Account: $e");
     }
   }
 

@@ -30,9 +30,13 @@ class _DialpadScreenState extends State<DialpadScreen> {
   void initState() {
     super.initState();
     _controller.text = "";
-
-    _fetchTwilioToken();
-    // requestPermissions();
+    requestPermissions();
+    Future.delayed(
+      Duration(seconds: 1),
+      () {
+        _fetchTwilioToken();
+      },
+    );
   }
 
   /// Fetches and initializes Twilio Token
@@ -67,7 +71,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
       await _registerPhoneAccount();
 
       await TwilioVoice.instance.requestReadPhoneNumbersPermission();
-      await TwilioVoice.instance.openPhoneAccountSettings();
+      // await TwilioVoice.instance.openPhoneAccountSettings();
       bool isPhoneAccountEnabled =
           await TwilioVoice.instance.isPhoneAccountEnabled();
 
@@ -86,6 +90,8 @@ class _DialpadScreenState extends State<DialpadScreen> {
       bool? isRegistered = await TwilioVoice.instance.registerPhoneAccount();
       if (isRegistered!) {
         print("✅ Phone Account Registered Successfully");
+        // ⏳ Delay before making a call (Allow time for registration)
+        await Future.delayed(Duration(seconds: 2));
       } else {
         print("⚠️ Failed to Register Phone Account");
       }
@@ -430,6 +436,8 @@ class _DialpadScreenState extends State<DialpadScreen> {
         print("⚠️ No Phone Account Registered! Registering now...");
         await _registerPhoneAccount();
       }
+      // 🔹 Add delay to ensure registration completes
+      await Future.delayed(Duration(seconds: 2));
 
       if (!_twilioService.isTokenExpired(twilioToken)) {
         await _twilioService.makeCall(_controller.text);
