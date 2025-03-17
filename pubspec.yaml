@@ -54,6 +54,8 @@ dependencies:
   #check expire token
   dart_jsonwebtoken: ^2.17.0
 
+  flutter_contacts: ^1.1.9+2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

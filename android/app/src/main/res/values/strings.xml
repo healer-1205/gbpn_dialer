@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connection_service_name" translatable="false">Twilio Voice Example Connection Service</string>
+    <string name="phone_account_name" translatable="false">GBPN Dialer</string>
+    <string name="phone_account_desc" translatable="false">GBPN Dialer voice calls calling account</string>
+</resources>

@@ -65,15 +65,27 @@ class _DialpadScreenState extends State<DialpadScreen> {
   Future<void> _initializeTwilio() async {
     try {
       final deviceToken = await StorageService().getFCMToken();
-      await _twilioService.initialize(twilioToken, deviceToken!);
+      await _twilioService.initialize(twilioToken, deviceToken!, context);
 
       // 🔹 Register Phone Account
-      await _registerPhoneAccount();
+      // 🔹 Ensure the phone account is registered
+      bool hasAccount = await TwilioVoice.instance.hasRegisteredPhoneAccount();
+      if (!hasAccount) {
+        print("⚠️ No Phone Account Registered! Registering now...");
+        await _registerPhoneAccount();
+      }
 
       await TwilioVoice.instance.requestReadPhoneNumbersPermission();
-      await TwilioVoice.instance.openPhoneAccountSettings();
+      // 🔹 Ensure the phone account is enabled before opening settings
       bool isPhoneAccountEnabled =
           await TwilioVoice.instance.isPhoneAccountEnabled();
+
+      if (!isPhoneAccountEnabled) {
+        print("⚠️ Phone account is NOT enabled! Opening settings...");
+        await TwilioVoice.instance.openPhoneAccountSettings();
+      } else {
+        print("✅ Phone account is already enabled.");
+      }
 
       if (isPhoneAccountEnabled) {
         TwilioVoice.instance.requestCallPhonePermission();

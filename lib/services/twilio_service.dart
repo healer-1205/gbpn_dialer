@@ -1,5 +1,8 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:flutter/material.dart';
 import 'package:twilio_voice/twilio_voice.dart';
+
+import '../screens/incoming_screen/incoming_call_screen.dart';
 
 class TwilioService {
   static final TwilioService _instance = TwilioService._internal();
@@ -14,7 +17,8 @@ class TwilioService {
   Stream<CallEvent> get callEvents => TwilioVoice.instance.callEventsListener;
 
   /// Initialize Twilio with tokens
-  Future<void> initialize(String accessToken, String deviceToken) async {
+  Future<void> initialize(
+      String accessToken, String deviceToken, BuildContext context) async {
     try {
       await TwilioVoice.instance.setTokens(
         accessToken: accessToken,
@@ -29,7 +33,7 @@ class TwilioService {
       // 🔹 Add delay to ensure registration completes
       await Future.delayed(Duration(seconds: 2));
 
-      _setupListeners();
+      _setupListeners(context);
       print("Twilio Initialized Successfully");
     } catch (e) {
       print("Twilio Initialization Failed: $e");
@@ -55,8 +59,8 @@ class TwilioService {
   Future<void> makeCall(String toNumber) async {
     try {
       await TwilioVoice.instance.call.place(
-        from: '+15093611979', // Twilio Number
-        to: '+18042221111',
+        from: '+15093611979', // Twilio Number 15093611979
+        to: '+1$toNumber', //18042221111
       );
       print("Calling $toNumber...");
     } catch (e) {
@@ -77,7 +81,7 @@ class TwilioService {
   }
 
   /// Setup listeners for Twilio events
-  void _setupListeners() {
+  void _setupListeners(BuildContext context) {
     // Listen for Twilio Call Events
     TwilioVoice.instance.callEventsListener.listen((event) {
       print("Call Event: $event");
@@ -85,6 +89,10 @@ class TwilioService {
       switch (event) {
         case CallEvent.incoming:
           print("Incoming Call detected!");
+          if (context.mounted) {
+            showIncomingCallScreen(context);
+          }
+          // showIncomingCallScreen(context);
           break;
         case CallEvent.connected:
           print("Call Connected!");
@@ -98,9 +106,33 @@ class TwilioService {
         case CallEvent.reconnecting:
           print("Reconnecting Call...");
           break;
+        case CallEvent.declined:
+          print("🚫 Call Declined");
+          break;
         default:
-          print("Other Event: $event");
+          print("⚠️ Other Event: $event");
       }
     });
+  }
+
+  /// Show Incoming Call Screen
+  void showIncomingCallScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            IncomingCallScreen(callerName: "GBPN Dialer Testing"),
+      ),
+    );
+  }
+
+  /// Answer the Call
+  Future<void> answerCall() async {
+    await TwilioVoice.instance.call.answer();
+  }
+
+  /// Decline the Call
+  Future<void> declineCall() async {
+    await TwilioVoice.instance.call.hangUp();
   }
 }
