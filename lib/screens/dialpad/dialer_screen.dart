@@ -9,6 +9,7 @@ import 'package:twilio_voice/twilio_voice.dart';
 
 import '../../services/storage_service.dart';
 import '../../services/twilio_service.dart';
+import '../outgoing_call_screen.dart';
 
 class DialpadScreen extends StatefulWidget {
   const DialpadScreen({super.key});
@@ -124,6 +125,9 @@ class _DialpadScreenState extends State<DialpadScreen> {
       switch (event) {
         case CallEvent.callEnded:
           _controller.text = '';
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context); // Close Outgoing Call Screen when call ends
+          }
           break;
         case CallEvent.connected:
           print('Call Connected');
@@ -443,6 +447,15 @@ class _DialpadScreenState extends State<DialpadScreen> {
     if (_controller.text.isEmpty) return;
 
     try {
+      // Navigate to Outgoing Call Screen before making a call
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              OutgoingCallScreen(toNumber: _controller.text),
+        ),
+      );
+
       bool hasAccount = await TwilioVoice.instance.hasRegisteredPhoneAccount();
       if (!hasAccount) {
         print("⚠️ No Phone Account Registered! Registering now...");
@@ -452,6 +465,11 @@ class _DialpadScreenState extends State<DialpadScreen> {
       await Future.delayed(Duration(seconds: 2));
 
       if (!_twilioService.isTokenExpired(twilioToken)) {
+
+        // 🚀 Delay call placement to prevent UI conflict
+        await Future.delayed(Duration(milliseconds: 500));
+
+        // Place the call
         await _twilioService.makeCall(_controller.text);
         print("📞 Calling ${_controller.text}...");
       } else {
