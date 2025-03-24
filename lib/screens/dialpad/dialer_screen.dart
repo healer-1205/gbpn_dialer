@@ -9,7 +9,7 @@ import 'package:twilio_voice/twilio_voice.dart';
 
 import '../../services/storage_service.dart';
 import '../../services/twilio_service.dart';
-import '../outgoing_call_screen.dart';
+import '../outgoing_screen/outgoing_call_screen.dart';
 
 class DialpadScreen extends StatefulWidget {
   const DialpadScreen({super.key});
@@ -448,13 +448,13 @@ class _DialpadScreenState extends State<DialpadScreen> {
 
     try {
       // Navigate to Outgoing Call Screen before making a call
-      Navigator.push(
+      /*Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) =>
               OutgoingCallScreen(toNumber: _controller.text),
         ),
-      );
+      );*/
 
       bool hasAccount = await TwilioVoice.instance.hasRegisteredPhoneAccount();
       if (!hasAccount) {
