@@ -136,3 +136,7 @@ app.*.symbols
 /linux
 /windows
 /macos
+
+# sensitive custom data
+/android/app/google-services.json
+/lib/services/firebase_options.dart
