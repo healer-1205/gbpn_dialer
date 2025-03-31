@@ -48,6 +48,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
   Future<void> _makeCall(String token, String to) async {
     try {
       await TwilioVoice.instance.requestReadPhoneNumbersPermission();
+      await TwilioVoice.instance.requestCallPhonePermission();
       await TwilioVoice.instance.registerPhoneAccount();
       await TwilioVoice.instance.openPhoneAccountSettings();
       bool isPhoneAccountEnabled =
@@ -55,6 +56,28 @@ class _DialpadScreenState extends State<DialpadScreen> {
 
       if (isPhoneAccountEnabled) {
         TwilioVoice.instance.requestCallPhonePermission();
+        // TwilioVoice.instance.callEventsListener.listen(
+        //   (event) {},
+        //   onError: (error, stackTrace) {
+        //     print("Errortrack: $error");
+        //     print("StackTrace: $stackTrace");
+        //   },
+        //   onDone: () {
+        //     print("Call Event Stream Closed.");
+        //   },
+        // );
+        const testtoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTSzkwYjU4ODg5ZWU2OTRlNzlkYmJhOWFiNmE5NTk2Y2EyLTE3NDE5NDk0NTciLCJncmFudHMiOnsiaWRlbnRpdHkiOiJ1c2VyIiwidm9pY2UiOnsiaW5jb21pbmciOnsiYWxsb3ciOnRydWV9LCJvdXRnb2luZyI6eyJhcHBsaWNhdGlvbl9zaWQiOiJBUDhlOTc0YWIxOGYyOGM2M2IyOTliOTFlYTk1ZjNmNjc3In19fSwiaWF0IjoxNzQxOTQ5NDU3LCJleHAiOjE3NDE5NTMwNTcsImlzcyI6IlNLOTBiNTg4ODllZTY5NGU3OWRiYmE5YWI2YTk1OTZjYTIiLCJzdWIiOiJBQzhmOTlhNTM5NjZjZjI4Mjk3YjgyMTcyODE2YzE0MTM1In0.auZZXSUQoEdzpGD8SbneMC894-NMO-TCfN63r4wvFR4";
+        await TwilioVoice.instance.setTokens(
+            accessToken: testtoken,
+            deviceToken:
+                "eA1b23C4dEfGhI5j6K7LmNoPqRsTuVwXyZ890ABcDeFgHIJKLMNOP1234567890abcdef");
+        print("Token setup successful!");
+        try {
+          await TwilioVoice.instance.call
+              .place(from: "+15093611979", to: "+18042221111");
+        } on PlatformException catch (e) {
+          print("reason: ${e.message}");
+        }
       }
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
