@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
+import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:twilio_voice/_internal/utils.dart';
 import 'package:twilio_voice/twilio_voice.dart';
 
 class TwilioService {
   static final TwilioService _instance = TwilioService._internal();
-
+  final StorageService _storage = StorageService();
   factory TwilioService() {
     return _instance;
   }

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:gbpn_dealer/models/auth_response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
@@ -9,6 +12,25 @@ class StorageService {
   Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('auth_token');
+  }
+
+  Future<void> saveAuthResponse(AuthResponse authResponse) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_response', jsonEncode(authResponse.toJson()));
+  }
+
+  Future<AuthResponse?> getAuthResponse() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? authResponseJson = prefs.getString('auth_response');
+    if (authResponseJson != null) {
+      return AuthResponse.fromJson(jsonDecode(authResponseJson));
+    }
+    return null;
+  }
+
+  Future<void> deleteAuthResponse() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_response');
   }
 
   Future<void> clearToken() async {
