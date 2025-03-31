@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "656416273390",
+    "project_id": "mobile-app-d246c",
+    "storage_bucket": "mobile-app-d246c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656416273390:android:65accf53ff893e0b2ed4ff",
+        "android_client_info": {
+          "package_name": "com.example.gbpn_dealer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0hUE5TTqsT0m2bVakOtJ-X1-HJD7gKhw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
