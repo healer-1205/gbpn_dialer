@@ -3,8 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gbpn_dealer/services/storage_service.dart';
 
-import 'firebase_options.dart';
-
+@pragma('vm:entry-point')
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
   final StorageService _storage = StorageService();
@@ -18,7 +17,6 @@ class FirebaseService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   Future<void> initialize() async {
-
     await requestPermission();
     _handleTokenRefresh();
     _listenToMessages();
@@ -52,6 +50,7 @@ class FirebaseService {
   void _handleTokenRefresh() {
     _firebaseMessaging.onTokenRefresh.listen((newToken) {
       debugPrint("FCM Token refreshed: $newToken");
+
       // TODO: Send this token to your server if needed
     });
   }
@@ -59,16 +58,17 @@ class FirebaseService {
   /// Listen for background & terminated notifications
   void _listenToMessages() {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint("🔔 Notification tapped: ${message.notification?.title}");
+      debugPrint("🔔 Notification tapped: ${message.toString()}");
       // TODO: Navigate user to a specific screen if required
     });
 
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
+}
 
-  /// Background message handler
-  static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp();
-    debugPrint("🔔 Background message received: ${message.notification?.title}");
-  }
+/// Background message handler
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint("🔔 Background message received: ${message.notification?.title}");
 }

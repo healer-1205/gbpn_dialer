@@ -46,7 +46,7 @@ dependencies:
   # notification
   firebase_messaging: ^15.2.4
 
-  twilio_voice: ^0.2.0+1
+  twilio_voice: ^0.2.2
 
   # to show toast
   fluttertoast: ^8.2.12

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "567512315222",
-    "project_id": "twiliodemo-bf268",
-    "storage_bucket": "twiliodemo-bf268.firebasestorage.app"
+    "project_number": "230438338034",
+    "project_id": "gbpd-8468e",
+    "storage_bucket": "gbpd-8468e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:567512315222:android:89f14df04d1f8cf0d392f7",
+        "mobilesdk_app_id": "1:230438338034:android:5a253950cda4aba589ff6b",
         "android_client_info": {
           "package_name": "com.example.gbpn_dealer"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCsbJvn6HWC1C1cKH-72lZdvD6xgK8PWhE"
+          "current_key": "AIzaSyDuy7oaIv7z6M02fThizpCygu95XJckbMY"
         }
       ],
       "services": {
