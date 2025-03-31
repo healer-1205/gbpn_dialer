@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gbpn_dealer/screens/permissions/permissions_block.dart'
+    show PermissionState;
 import 'package:gbpn_dealer/utils/extension.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:gbpn_dealer/utils/utils.dart';
 import 'package:twilio_voice/twilio_voice.dart';
 
 import '../../services/storage_service.dart';
 import '../../services/twilio_service.dart';
-import '../outgoing_call_screen.dart';
 
 class DialpadScreen extends StatefulWidget {
   const DialpadScreen({super.key});
@@ -31,7 +31,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
   void initState() {
     super.initState();
     _controller.text = "";
-    requestPermissions();
+    //requestPermissions();
     Future.delayed(
       Duration(seconds: 1),
       () {
@@ -68,49 +68,75 @@ class _DialpadScreenState extends State<DialpadScreen> {
       final deviceToken = await StorageService().getFCMToken();
       await _twilioService.initialize(twilioToken, deviceToken!, context);
 
-      // 🔹 Register Phone Account
-      // 🔹 Ensure the phone account is registered
-      bool hasAccount = await TwilioVoice.instance.hasRegisteredPhoneAccount();
-      if (!hasAccount) {
-        print("⚠️ No Phone Account Registered! Registering now...");
-        await _registerPhoneAccount();
-      }
-
-      await TwilioVoice.instance.requestReadPhoneNumbersPermission();
-      // 🔹 Ensure the phone account is enabled before opening settings
-      bool isPhoneAccountEnabled =
-          await TwilioVoice.instance.isPhoneAccountEnabled();
-
-      if (!isPhoneAccountEnabled) {
-        print("⚠️ Phone account is NOT enabled! Opening settings...");
-        await TwilioVoice.instance.openPhoneAccountSettings();
-      } else {
-        print("✅ Phone account is already enabled.");
-      }
-
-      if (isPhoneAccountEnabled) {
-        TwilioVoice.instance.requestCallPhonePermission();
-      }
       _setupCallListeners();
-      print("Twilio initialized successfully.");
+      _permissionRequiredDialog();
     } catch (e) {
-      print("Error initializing Twilio: $e");
+      printDebug("Error initializing Twilio: $e");
     }
   }
 
-  Future<void> _registerPhoneAccount() async {
-    try {
-      bool? isRegistered = await TwilioVoice.instance.registerPhoneAccount();
-      if (isRegistered!) {
-        print("✅ Phone Account Registered Successfully");
-        // ⏳ Delay before making a call (Allow time for registration)
-        await Future.delayed(Duration(seconds: 2));
-      } else {
-        print("⚠️ Failed to Register Phone Account");
-      }
-    } catch (e) {
-      print("❌ Error Registering Phone Account: $e");
-    }
+  Future<void> _permissionRequiredDialog() async {
+    if (await PermissionState.checkAllPermissions()) return;
+    await showAdaptiveDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text(
+            "Permission Required",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.security,
+                size: 48,
+                color: Colors.blue,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "To make calls, we need access to your phone permissions. Please grant the required permissions to continue.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () async {
+                await Navigator.pushNamed(context, '/permission_block');
+                Navigator.pop(context);
+              },
+              child: const Text("Proceed"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   /// Setup call event listeners
@@ -139,26 +165,6 @@ class _DialpadScreenState extends State<DialpadScreen> {
           break;
       }
     });
-  }
-
-  // Add this method
-  void _decodeAndPrintToken(String token) {
-    try {
-      final jwt = JWT.decode(token);
-      print('Token Contents:');
-      print('Issuer (iss): ${jwt.payload['iss']}');
-      print('Subject (sub): ${jwt.payload['sub']}');
-      print('Expiration (exp): ${jwt.payload['exp']}');
-      print('Grants: ${jwt.payload['grants']}');
-    } catch (e) {
-      print('Token decode error: $e');
-    }
-  }
-
-  // Request required permissions for calls
-  Future<void> requestPermissions() async {
-    await Permission.microphone.request();
-    await Permission.phone.request();
   }
 
   @override
@@ -447,38 +453,22 @@ class _DialpadScreenState extends State<DialpadScreen> {
     if (_controller.text.isEmpty) return;
 
     try {
-      // Navigate to Outgoing Call Screen before making a call
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              OutgoingCallScreen(toNumber: _controller.text),
-        ),
-      );
-
-      bool hasAccount = await TwilioVoice.instance.hasRegisteredPhoneAccount();
-      if (!hasAccount) {
-        print("⚠️ No Phone Account Registered! Registering now...");
-        await _registerPhoneAccount();
+      bool hasPermission = await PermissionState.checkAllPermissions();
+      if (!hasPermission) {
+        printDebug("⚠️ No Phone Account Registered! Registering now...");
+        await _permissionRequiredDialog();
       }
-      // 🔹 Add delay to ensure registration completes
-      await Future.delayed(Duration(seconds: 2));
 
       if (!_twilioService.isTokenExpired(twilioToken)) {
-
-        // 🚀 Delay call placement to prevent UI conflict
-        await Future.delayed(Duration(milliseconds: 500));
-
         // Place the call
         await _twilioService.makeCall(_controller.text);
-        print("📞 Calling ${_controller.text}...");
       } else {
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/signin');
         }
       }
     } catch (e) {
-      print("Call failed: $e");
+      printDebug("Call failed: $e");
     }
   }
 }
