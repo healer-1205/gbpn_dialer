@@ -40,7 +40,8 @@ class FirebaseService {
 
   /// Get the FCM token
   Future<String?> getFCMToken() async {
-    String? fcmToken = await _firebaseMessaging.getToken();
+    String? fcmToken =
+        await _storage.getFCMToken() ?? await _firebaseMessaging.getToken();
     await _storage.saveFCMToken(fcmToken!);
     // return await _firebaseMessaging.getToken();
     return fcmToken;
@@ -48,9 +49,9 @@ class FirebaseService {
 
   /// Handle FCM Token Refresh
   void _handleTokenRefresh() {
-    _firebaseMessaging.onTokenRefresh.listen((newToken) {
+    _firebaseMessaging.onTokenRefresh.listen((newToken) async {
       debugPrint("FCM Token refreshed: $newToken");
-
+      await _storage.saveFCMToken(newToken!);
       // TODO: Send this token to your server if needed
     });
   }

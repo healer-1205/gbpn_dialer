@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gbpn_dealer/screens/incoming_screen/incoming_call_screen.dart';
+import 'package:gbpn_dealer/screens/permissions/permissions_block.dart';
 import '../screens/dialpad/dialer_screen.dart';
 import '../screens/intro/screen.dart';
 import '../screens/main_screen/main_screen_view.dart';
@@ -19,8 +20,12 @@ class Routes {
         return MaterialPageRoute(builder: (_) => const MainScreenView());
       case '/dialpad':
         return MaterialPageRoute(builder: (_) => const DialpadScreen());
+      case '/permission_block':
+        return MaterialPageRoute(builder: (_) => const PermissionsBlock());
       case '/incoming_call_screen':
-        return MaterialPageRoute(builder: (_) => IncomingCallScreen(callerName: "My Testing Twilio"));
+        return MaterialPageRoute(
+            builder: (_) =>
+                IncomingCallScreen(callerName: "My Testing Twilio"));
       default:
         return null;
     }

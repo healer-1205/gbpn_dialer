@@ -21,8 +21,6 @@ class TwilioService {
   Future<void> initialize(
       String accessToken, String deviceToken, BuildContext context) async {
     try {
-      await _requestPermissions();
-
       await TwilioVoice.instance.setTokens(
         accessToken: accessToken,
         deviceToken: deviceToken,
@@ -34,14 +32,7 @@ class TwilioService {
         );
       });
 
-      bool hasAccount = await TwilioVoice.instance.hasRegisteredPhoneAccount();
-      if (!hasAccount) {
-        log("⚠️ No Phone Account Registered! Registering now...");
-        await _registerPhoneAccount();
-      }
       TwilioVoice.instance.setDefaultCallerName("Unknown");
-      // 🔹 Add delay to ensure registration completes
-      await Future.delayed(Duration(seconds: 2));
 
       _setupListeners(context);
       log("Twilio Initialized Successfully");
@@ -50,55 +41,9 @@ class TwilioService {
     }
   }
 
-  Future<void> _requestPermissions() async {
-    if (!Platform.isAndroid) return;
-    var result = await TwilioVoice.instance
-        .requestCallPhonePermission(); // Gives Android permissions to place outgoing calls
-    result = await TwilioVoice.instance
-        .requestReadPhoneStatePermission(); // Gives Android permissions to read Phone State including receiving calls
-    result = await TwilioVoice.instance
-        .requestReadPhoneNumbersPermission(); // Gives Android permissions to read Phone Accounts
-    result = await TwilioVoice.instance
-        .requestManageOwnCallsPermission(); // Gives Android permissions to manage calls, this isn't necessary to request as the permission is simply required in the Manifest, but added nontheless.
-    result = await TwilioVoice.instance.isRejectingCallOnNoPermissions();
-    log('result $result');
-  }
-
-  /// Register Phone Account
-  Future<void> _registerPhoneAccount() async {
-    try {
-      bool? isRegistered = await TwilioVoice.instance.registerPhoneAccount();
-      if (isRegistered!) {
-        log("✅ Phone Account Registered Successfully");
-        // ⏳ Delay before making a call (Allow time for registration)
-        await Future.delayed(Duration(seconds: 2));
-      } else {
-        log("⚠️ Failed to Register Phone Account");
-      }
-    } catch (e) {
-      log("❌ Error Registering Phone Account: $e");
-    }
-  }
-
   /// Make a call
   Future<void> makeCall(String toNumber) async {
     try {
-      if (!await (TwilioVoice.instance.hasRegisteredPhoneAccount())) {
-        printDebug("request phone account");
-        TwilioVoice.instance.registerPhoneAccount();
-        return;
-      }
-      if (!await (TwilioVoice.instance.hasMicAccess())) {
-        printDebug("request mic access");
-        TwilioVoice.instance.requestMicAccess();
-        return;
-      }
-      if (!await (TwilioVoice.instance.hasCallPhonePermission())) {
-        printDebug("request call phone permission");
-        TwilioVoice.instance.requestCallPhonePermission();
-        return;
-      }
-
       await TwilioVoice.instance.call.place(
         from: 'alice', // Twilio Number 15093611979
         to: 'john', //18042221111

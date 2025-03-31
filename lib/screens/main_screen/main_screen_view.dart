@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../contacts/contact_screen.dart';
 import '../dialpad/dialer_screen.dart';
