@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:gbpn_dealer/utils/extension.dart';
 import '../../utils/constant.dart';
 import '../../utils/style.dart';
@@ -46,6 +49,17 @@ class _SignInScreenState extends State<SignInScreen> {
         SnackBar(content: Text(success)),
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_clearPreviousDerails());
+  }
+
+  Future<void> _clearPreviousDerails() async {
+    final storage = StorageService();
+    await storage.clear();
   }
 
   @override

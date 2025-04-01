@@ -36,12 +36,8 @@ class _PhoneNumberSelectionScreenState
     setState(() {
       _teams = fetchedTeams;
       if (_teams.isEmpty) return;
-      _selectedPhoneNumberId =
-          selectedPhoneNumber?.id ?? _teams[0].phoneNumbers[0].id;
+      _selectedPhoneNumberId = selectedPhoneNumber?.id;
     });
-    if (selectedPhoneNumber == null && _teams.isNotEmpty) {
-      await _storageService.saveActivePhoneNumber(_teams[0].phoneNumbers[0]);
-    }
   }
 
   Future<void> _updateActivePhoneNumber(PhoneNumber phoneNumber) async {

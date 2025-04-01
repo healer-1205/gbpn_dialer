@@ -43,11 +43,11 @@ class TwilioService {
   }
 
   /// Make a call
-  Future<void> makeCall(String toNumber) async {
+  Future<void> makeCall(String from, String toNumber) async {
     try {
       await TwilioVoice.instance.call.place(
-        from: 'alice', // Twilio Number 15093611979
-        to: 'john', //18042221111
+        from: from, // Twilio Number 15093611979
+        to: toNumber, //18042221111
       );
       log("Calling $toNumber...");
     } catch (e) {

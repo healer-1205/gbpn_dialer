@@ -82,4 +82,11 @@ class StorageService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('fcm_token');
   }
+
+  Future<void> clear() async {
+    await deleteAuthResponse();
+    await deleteActivePhoneNumber();
+    await clearToken();
+    await clearTwilioAccessToken();
+  }
 }
