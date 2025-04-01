@@ -15,14 +15,14 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         children: [
           // Account Section
-          _buildSectionHeader(context, 'Account'),
-          ListTile(
-            leading: const Icon(Icons.person_outline),
-            title: const Text('Profile'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
-          const Divider(),
+          // _buildSectionHeader(context, 'Account'),
+          // ListTile(
+          //   leading: const Icon(Icons.person_outline),
+          //   title: const Text('Profile'),
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {},
+          // ),
+          // const Divider(),
 
           // Communication Section
           _buildSectionHeader(context, 'Communication'),
@@ -40,37 +40,37 @@ class SettingsScreen extends StatelessWidget {
               );
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.email_outlined),
-            title: const Text('Email Addresses'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
-          const Divider(),
+          // ListTile(
+          //   leading: const Icon(Icons.email_outlined),
+          //   title: const Text('Email Addresses'),
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {},
+          // ),
+          // const Divider(),
 
-          // Appearance Section
-          _buildSectionHeader(context, 'Appearance'),
-          ListTile(
-            leading: const Icon(Icons.dark_mode_outlined),
-            title: const Text('Theme'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
+          // // Appearance Section
+          // _buildSectionHeader(context, 'Appearance'),
+          // ListTile(
+          //   leading: const Icon(Icons.dark_mode_outlined),
+          //   title: const Text('Theme'),
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {},
+          // ),
 
-          // Privacy & Security
-          _buildSectionHeader(context, 'Privacy & Security'),
-          ListTile(
-            leading: const Icon(Icons.lock_outline),
-            title: const Text('Security'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
-          ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('Privacy'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
+          // // Privacy & Security
+          // _buildSectionHeader(context, 'Privacy & Security'),
+          // ListTile(
+          //   leading: const Icon(Icons.lock_outline),
+          //   title: const Text('Security'),
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {},
+          // ),
+          // ListTile(
+          //   leading: const Icon(Icons.privacy_tip_outlined),
+          //   title: const Text('Privacy'),
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {},
+          // ),
         ],
       ),
     );
