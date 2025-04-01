@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:gbpn_dealer/models/auth_response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
@@ -9,6 +12,45 @@ class StorageService {
   Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('auth_token');
+  }
+
+  Future<void> saveAuthResponse(AuthResponse authResponse) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_response', jsonEncode(authResponse.toJson()));
+  }
+
+  Future<AuthResponse?> getAuthResponse() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? authResponseJson = prefs.getString('auth_response');
+    if (authResponseJson != null) {
+      return AuthResponse.fromJson(jsonDecode(authResponseJson));
+    }
+    return null;
+  }
+
+  Future<void> deleteAuthResponse() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_response');
+  }
+
+  Future<void> saveActivePhoneNumber(PhoneNumber phoneNumber) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        'active_phone_number', jsonEncode(phoneNumber.toJson()));
+  }
+
+  Future<PhoneNumber?> getActivePhoneNumber() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? phoneNumberJson = prefs.getString('active_phone_number');
+    if (phoneNumberJson != null) {
+      return PhoneNumber.fromJson(jsonDecode(phoneNumberJson));
+    }
+    return null;
+  }
+
+  Future<void> deleteActivePhoneNumber() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('active_phone_number');
   }
 
   Future<void> clearToken() async {
@@ -39,5 +81,12 @@ class StorageService {
   Future<String?> getFCMToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('fcm_token');
+  }
+
+  Future<void> clear() async {
+    await deleteAuthResponse();
+    await deleteActivePhoneNumber();
+    await clearToken();
+    await clearTwilioAccessToken();
   }
 }

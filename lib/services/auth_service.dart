@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:gbpn_dealer/models/auth_response.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
 
@@ -13,10 +14,10 @@ class AuthService {
     });
 
     if (response.statusCode == 200) {
-      String token = response.data['token'];
-      String twilioAccessToken = response.data['twilio_access_token'];
-      await _storage.saveToken(token);
-      await _storage.saveTwilioAccessToken(twilioAccessToken);
+      final authResponse = AuthResponse.fromJson(response.data);
+      await _storage.saveToken(authResponse.token);
+      await _storage.saveAuthResponse(authResponse);
+      await _storage.saveTwilioAccessToken(authResponse.twilioAccessToken);
       return null;
     }
 

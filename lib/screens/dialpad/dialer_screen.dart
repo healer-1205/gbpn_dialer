@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gbpn_dealer/screens/dialpad/active_number_reminder_dialog.dart';
 import 'package:gbpn_dealer/screens/permissions/permissions_block.dart'
     show PermissionState;
 import 'package:gbpn_dealer/utils/extension.dart';
@@ -231,6 +232,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0),
           child: Column(
@@ -460,8 +462,13 @@ class _DialpadScreenState extends State<DialpadScreen> {
       }
 
       if (!_twilioService.isTokenExpired(twilioToken)) {
+        final fromNumber = await StorageService().getActivePhoneNumber();
+        if (fromNumber == null) {
+          _showActiveNumberReminder(context);
+          return;
+        }
         // Place the call
-        await _twilioService.makeCall(_controller.text);
+        await _twilioService.makeCall(fromNumber.phoneNumber, _controller.text);
       } else {
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/signin');
@@ -470,5 +477,18 @@ class _DialpadScreenState extends State<DialpadScreen> {
     } catch (e) {
       printDebug("Call failed: $e");
     }
+  }
+
+  // Usage example:
+  void _showActiveNumberReminder(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => ActiveNumberReminderDialog(
+        onNavigateToSettings: () {
+          // Navigate to settings screen
+          Navigator.pushNamed(context, '/settings');
+        },
+      ),
+    );
   }
 }

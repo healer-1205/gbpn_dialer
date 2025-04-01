@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
+import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:twilio_voice/_internal/utils.dart';
 import 'package:twilio_voice/twilio_voice.dart';
 
 class TwilioService {
   static final TwilioService _instance = TwilioService._internal();
-
+  final StorageService _storage = StorageService();
   factory TwilioService() {
     return _instance;
   }
@@ -42,11 +43,11 @@ class TwilioService {
   }
 
   /// Make a call
-  Future<void> makeCall(String toNumber) async {
+  Future<void> makeCall(String from, String toNumber) async {
     try {
       await TwilioVoice.instance.call.place(
-        from: 'alice', // Twilio Number 15093611979
-        to: 'john', //18042221111
+        from: from, // Twilio Number 15093611979
+        to: toNumber, //18042221111
       );
       log("Calling $toNumber...");
     } catch (e) {
