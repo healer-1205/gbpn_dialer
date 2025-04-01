@@ -231,6 +231,7 @@ class _DialpadScreenState extends State<DialpadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0),
           child: Column(

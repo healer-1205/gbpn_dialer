@@ -52,6 +52,18 @@ class _MainScreenViewState extends State<MainScreenView> {
               ),
             ),
           ),
+          Visibility(
+            visible: _currentIndex == 0,
+            child: IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/settings');
+              },
+              icon: Icon(
+                Icons.settings,
+                size: 30,
+              ),
+            ),
+          ),
           SizedBox(width: 15),
         ],
       ),

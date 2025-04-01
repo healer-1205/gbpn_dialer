@@ -33,6 +33,26 @@ class StorageService {
     await prefs.remove('auth_response');
   }
 
+  Future<void> saveActivePhoneNumber(PhoneNumber phoneNumber) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        'active_phone_number', jsonEncode(phoneNumber.toJson()));
+  }
+
+  Future<PhoneNumber?> getActivePhoneNumber() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? phoneNumberJson = prefs.getString('active_phone_number');
+    if (phoneNumberJson != null) {
+      return PhoneNumber.fromJson(jsonDecode(phoneNumberJson));
+    }
+    return null;
+  }
+
+  Future<void> deleteActivePhoneNumber() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('active_phone_number');
+  }
+
   Future<void> clearToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
