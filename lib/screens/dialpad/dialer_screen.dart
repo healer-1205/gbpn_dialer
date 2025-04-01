@@ -262,42 +262,6 @@ class _DialpadScreenState extends State<DialpadScreen> {
     );
   }
 
-  Widget _buildBottomNavigation() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey, width: 0.5)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem("Keypad", true),
-          _buildNavItem("Recents", false),
-          _buildNavItem("Contacts", false),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(String text, bool isSelected) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(text,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.black : Colors.grey)),
-        if (isSelected)
-          Container(
-              width: 40,
-              height: 2,
-              color: Colors.black,
-              margin: const EdgeInsets.only(top: 4)),
-      ],
-    );
-  }
-
   void scrollToEndPosition() {
     _scrollController.animateTo(_scrollController.position.maxScrollExtent + 13,
         curve: Curves.ease, duration: Duration(milliseconds: 100));
