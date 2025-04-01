@@ -21,7 +21,11 @@ class ActiveNumberReminderDialog extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
           ),
           SizedBox(width: 12),
-          Text('No Active Number Selected'),
+          Expanded(
+              child: Text(
+            'No Active Number Selected',
+            softWrap: true,
+          )),
         ],
       ),
       content: Column(

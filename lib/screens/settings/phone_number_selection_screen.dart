@@ -135,10 +135,11 @@ class _PhoneNumberSelectionScreenState
                           : BorderSide.none,
                     ),
                     child: InkWell(
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           _selectedPhoneNumberId = phoneNumber.id;
                         });
+                        _updateActivePhoneNumber(phoneNumber);
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         // Show confirmation
                         ScaffoldMessenger.of(context).showSnackBar(
