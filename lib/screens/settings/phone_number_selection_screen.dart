@@ -41,6 +41,15 @@ class _PhoneNumberSelectionScreenState
   }
 
   Future<void> _updateActivePhoneNumber(PhoneNumber phoneNumber) async {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    // Show confirmation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Set ${phoneNumber.friendlyName} as active'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 3),
+      ),
+    );
     await _storageService.saveActivePhoneNumber(phoneNumber);
     setState(() {
       _selectedPhoneNumberId = phoneNumber.id;
@@ -140,26 +149,6 @@ class _PhoneNumberSelectionScreenState
                           _selectedPhoneNumberId = phoneNumber.id;
                         });
                         _updateActivePhoneNumber(phoneNumber);
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        // Show confirmation
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Set ${phoneNumber.friendlyName} as active'),
-                            behavior: SnackBarBehavior.floating,
-                            action: SnackBarAction(
-                              label: 'UNDO',
-                              onPressed: () {
-                                // Restore previous selection
-                                setState(() {
-                                  _selectedPhoneNumberId =
-                                      _selectedPhoneNumberId;
-                                });
-                              },
-                            ),
-                            duration: Duration(seconds: 3),
-                          ),
-                        );
                       },
                       borderRadius: BorderRadius.circular(12),
                       child: Padding(
