@@ -47,7 +47,7 @@ class TwilioService {
     try {
       await TwilioVoice.instance.call.place(
         from: from, // Twilio Number 15093611979
-        to: toNumber, //18042221111
+        to: toNumber.length != 10 ? toNumber : '+1$toNumber', //18042221111
       );
       log("Calling $toNumber...");
     } catch (e) {
