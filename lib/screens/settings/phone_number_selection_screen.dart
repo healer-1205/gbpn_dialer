@@ -1,12 +1,11 @@
 // Phone number selection screen
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_contacts/properties/phone.dart';
 import 'package:gbpn_dealer/models/auth_response.dart';
 import 'package:gbpn_dealer/services/storage_service.dart';
 
 class PhoneNumberSelectionScreen extends StatefulWidget {
-  const PhoneNumberSelectionScreen({Key? key}) : super(key: key);
+  const PhoneNumberSelectionScreen({super.key});
 
   @override
   State<PhoneNumberSelectionScreen> createState() =>
