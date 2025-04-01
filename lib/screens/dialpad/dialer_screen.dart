@@ -129,8 +129,8 @@ class _DialpadScreenState extends State<DialpadScreen> {
                 ),
               ),
               onPressed: () async {
-                await Navigator.pushNamed(context, '/permission_block');
                 Navigator.pop(context);
+                await Navigator.pushNamed(context, '/permission_block');
               },
               child: const Text("Proceed"),
             ),
@@ -458,7 +458,8 @@ class _DialpadScreenState extends State<DialpadScreen> {
       bool hasPermission = await PermissionState.checkAllPermissions();
       if (!hasPermission) {
         printDebug("⚠️ No Phone Account Registered! Registering now...");
-        await _permissionRequiredDialog();
+        _permissionRequiredDialog();
+        return;
       }
 
       if (!_twilioService.isTokenExpired(twilioToken)) {

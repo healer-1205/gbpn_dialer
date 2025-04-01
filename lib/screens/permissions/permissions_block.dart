@@ -26,6 +26,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasMicPermission = false;
 
   set setMicPermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasMicPermission = value;
     });
@@ -34,6 +35,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasRegisteredPhoneAccount = false;
 
   set setPhoneAccountRegistered(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasRegisteredPhoneAccount = value;
     });
@@ -42,6 +44,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasCallPhonePermission = false;
 
   set setCallPhonePermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasCallPhonePermission = value;
     });
@@ -50,6 +53,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasManageCallsPermission = false;
 
   set setManageCallsPermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasManageCallsPermission = value;
     });
@@ -58,6 +62,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _isPhoneAccountEnabled = false;
 
   set setIsPhoneAccountEnabled(bool value) {
+    if (!mounted) return;
     setState(() {
       _isPhoneAccountEnabled = value;
     });
@@ -66,6 +71,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasReadPhoneStatePermission = false;
 
   set setReadPhoneStatePermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasReadPhoneStatePermission = value;
     });
@@ -74,6 +80,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasReadPhoneNumbersPermission = false;
 
   set setReadPhoneNumbersPermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasReadPhoneNumbersPermission = value;
     });
@@ -82,6 +89,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasBackgroundPermissions = false;
 
   set setBackgroundPermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasBackgroundPermissions = value;
     });
@@ -282,6 +290,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
                                 !_isPhoneAccountEnabled
                             ? () async {
                                 if (_isPhoneAccountEnabled) {
+                                  if (!mounted) return;
                                   setState(() {
                                     _updatePermissions();
                                   });
