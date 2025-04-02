@@ -1,19 +1,33 @@
 import 'dart:developer';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
-import 'package:gbpn_dealer/services/storage_service.dart';
-import 'package:twilio_voice/_internal/utils.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:twilio_voice/twilio_voice.dart';
 
 class TwilioService {
   static final TwilioService _instance = TwilioService._internal();
-  final StorageService _storage = StorageService();
+
+  // Sound players
+  final FlutterSoundPlayer _soundPlayer = FlutterSoundPlayer();
+  final FlutterSoundPlayer _endCallSoundPlayer = FlutterSoundPlayer();
+  bool _isPlaying = false;
+
   factory TwilioService() {
     return _instance;
   }
-  TwilioService._internal();
+
+  TwilioService._internal() {
+    _initSoundPlayers();
+  }
+
+  /// Initialize the sound players
+  Future<void> _initSoundPlayers() async {
+    await _soundPlayer.openPlayer();
+    await _endCallSoundPlayer.openPlayer();
+  }
 
   /// Stream for call events
   Stream<CallEvent> get callEvents => TwilioVoice.instance.callEventsListener;
@@ -39,6 +53,49 @@ class TwilioService {
       log("Twilio Initialized Successfully");
     } catch (e) {
       log("Twilio Initialization Failed: $e");
+    }
+  }
+
+  Future<Uint8List> getAssetData(String path) async {
+    var asset = await rootBundle.load(path);
+    return asset.buffer.asUint8List();
+  }
+
+  /// Play ringtone sound
+  Future<void> _playRingtone() async {
+    if (!_isPlaying) {
+      try {
+        var bimData = await getAssetData('assets/sounds/phone-call.mp3');
+
+        await _soundPlayer.startPlayer(
+          fromDataBuffer: bimData,
+          codec: Codec.mp3,
+          whenFinished: () {
+            // Loop the sound when it finishes
+            if (_isPlaying) {
+              _playRingtone();
+            }
+          },
+        );
+        _isPlaying = true;
+        log("Started playing ringtone");
+      } catch (e) {
+        log("Error playing ringtone: $e");
+      }
+    }
+  }
+
+  /// Stop ringtone sound
+  Future<void> _stopRingtone() async {
+    if (_isPlaying) {
+      try {
+        await _soundPlayer.stopPlayer();
+        _isPlaying = false;
+        log("Stopped playing ringtone");
+      } catch (e) {
+        log("Error stopping ringtone: $e");
+        _isPlaying = false;
+      }
     }
   }
 
@@ -79,22 +136,27 @@ class TwilioService {
           if (context.mounted) {
             showIncomingCallScreen(context);
           }
-          // showIncomingCallScreen(context);
           break;
         case CallEvent.connected:
           log("Call Connected!");
+          _stopRingtone(); // Stop ringtone when call is connected
           break;
         case CallEvent.callEnded:
           log("Call Ended!");
+          _stopRingtone(); // Stop ringtone when call ends
+          _playEndCallSound(); // Play end call sound
           break;
         case CallEvent.ringing:
           log("Phone is Ringing!");
+          _playRingtone(); // Play ringtone when phone is ringing
           break;
         case CallEvent.reconnecting:
           log("Reconnecting Call...");
           break;
         case CallEvent.declined:
           log("🚫 Call Declined");
+          _stopRingtone(); // Stop ringtone when call is declined
+          _playEndCallSound(); // Play end call sound when call is declined
           break;
         default:
           log("⚠️ Other Event: $event");
@@ -121,5 +183,27 @@ class TwilioService {
   /// Decline the Call
   Future<void> declineCall() async {
     await TwilioVoice.instance.call.hangUp();
+    await _stopRingtone(); // Ensure ringtone is stopped when call is declined
+  }
+
+  /// Play end call sound
+  Future<void> _playEndCallSound() async {
+    try {
+      var endCallData = await getAssetData('assets/sounds/end-call.mp3');
+      await _endCallSoundPlayer.startPlayer(
+        fromDataBuffer: endCallData,
+        codec: Codec.mp3,
+      );
+      log("Playing end call sound");
+    } catch (e) {
+      log("Error playing end call sound: $e");
+    }
+  }
+
+  /// Dispose resources
+  Future<void> dispose() async {
+    await _stopRingtone();
+    await _soundPlayer.closePlayer();
+    await _endCallSoundPlayer.closePlayer();
   }
 }

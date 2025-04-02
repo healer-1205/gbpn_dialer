@@ -56,6 +56,9 @@ dependencies:
   flutter_contacts: ^1.1.9+2
   permission_handler: ^11.4.0
 
+  # for playing sound during calls
+  flutter_sound: ^9.28.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -81,6 +84,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/sounds/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
