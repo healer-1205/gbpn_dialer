@@ -42,17 +42,17 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyDK1SqrXbfn8HPC3BB5c7XSIF4xSb5G9zA',
-    appId: '1:656416273390:web:104b1ccdb236e9002ed4ff',
+    appId: '1:656416273390:web:c17a5dfe4378f17f2ed4ff',
     messagingSenderId: '656416273390',
     projectId: 'mobile-app-d246c',
     authDomain: 'mobile-app-d246c.firebaseapp.com',
     storageBucket: 'mobile-app-d246c.firebasestorage.app',
-    measurementId: 'G-NFHJZPZFE6',
+    measurementId: 'G-V801L9XQB0',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyB0hUE5TTqsT0m2bVakOtJ-X1-HJD7gKhw',
-    appId: '1:656416273390:android:65accf53ff893e0b2ed4ff',
+    appId: '1:656416273390:android:adb3545d82da059d2ed4ff',
     messagingSenderId: '656416273390',
     projectId: 'mobile-app-d246c',
     storageBucket: 'mobile-app-d246c.firebasestorage.app',
@@ -60,16 +60,16 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBvyHUVKkoyp3iFNERGlfhqIewf-A-OW9M',
-    appId: '1:656416273390:ios:aba998a8a95d8f542ed4ff',
+    appId: '1:656416273390:ios:7d94f87f757ccb3c2ed4ff',
     messagingSenderId: '656416273390',
     projectId: 'mobile-app-d246c',
     storageBucket: 'mobile-app-d246c.firebasestorage.app',
-    iosBundleId: 'com.example.gbpnDealer',
+    iosBundleId: 'com.gbpn.gbpnmobile',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBvyHUVKkoyp3iFNERGlfhqIewf-A-OW9M',
-    appId: '1:656416273390:ios:aba998a8a95d8f542ed4ff',
+    appId: '1:656416273390:ios:84cd0c7671af43a92ed4ff',
     messagingSenderId: '656416273390',
     projectId: 'mobile-app-d246c',
     storageBucket: 'mobile-app-d246c.firebasestorage.app',
@@ -78,12 +78,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyDK1SqrXbfn8HPC3BB5c7XSIF4xSb5G9zA',
-    appId: '1:656416273390:web:ffbe6d358ad730ba2ed4ff',
+    appId: '1:656416273390:web:a1f41822db3fd4cf2ed4ff',
     messagingSenderId: '656416273390',
     projectId: 'mobile-app-d246c',
     authDomain: 'mobile-app-d246c.firebaseapp.com',
     storageBucket: 'mobile-app-d246c.firebasestorage.app',
-    measurementId: 'G-HJ3P47NP8L',
+    measurementId: 'G-1SB2R7M05Q',
   );
-
 }
