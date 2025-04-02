@@ -69,11 +69,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBvyHUVKkoyp3iFNERGlfhqIewf-A-OW9M',
-    appId: '1:656416273390:ios:84cd0c7671af43a92ed4ff',
+    appId: '1:656416273390:ios:2a942a7786da01af2ed4ff',
     messagingSenderId: '656416273390',
     projectId: 'mobile-app-d246c',
     storageBucket: 'mobile-app-d246c.firebasestorage.app',
-    iosBundleId: 'com.example.gbpnDealer',
+    iosBundleId: 'com.example.gbpnDealer.RunnerTests',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'mobile-app-d246c.firebasestorage.app',
     measurementId: 'G-1SB2R7M05Q',
   );
+
 }
