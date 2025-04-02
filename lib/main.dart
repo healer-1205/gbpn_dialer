@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       builder: (context, child) {
-        return SafeArea(
+        return Container(
           child: child ?? const SizedBox.shrink(),
         );
       },
