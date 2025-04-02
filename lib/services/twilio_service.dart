@@ -9,6 +9,7 @@ import 'package:twilio_voice/twilio_voice.dart';
 
 class TwilioService {
   static final TwilioService _instance = TwilioService._internal();
+  late Uint8List bimData;
 
   // Sound players
   final FlutterSoundPlayer _soundPlayer = FlutterSoundPlayer();
@@ -27,6 +28,7 @@ class TwilioService {
   Future<void> _initSoundPlayers() async {
     await _soundPlayer.openPlayer();
     await _endCallSoundPlayer.openPlayer();
+    bimData = await getAssetData('assets/sounds/phone-call.mp3');
   }
 
   /// Stream for call events
@@ -61,27 +63,27 @@ class TwilioService {
     return asset.buffer.asUint8List();
   }
 
+  int _ringCount = 0;
+
   /// Play ringtone sound
   Future<void> _playRingtone() async {
     if (!_isPlaying) {
-      try {
-        var bimData = await getAssetData('assets/sounds/phone-call.mp3');
+      return;
+    }
+    try {
+      await _soundPlayer.startPlayer(
+        fromDataBuffer: bimData,
+        codec: Codec.mp3,
+        whenFinished: () async {
+          await Future.delayed(Duration(seconds: 2));
+          _playRingtone();
+          _isPlaying = true; // Restart the ringtone when it finishes
+        },
+      );
 
-        await _soundPlayer.startPlayer(
-          fromDataBuffer: bimData,
-          codec: Codec.mp3,
-          whenFinished: () {
-            // Loop the sound when it finishes
-            if (_isPlaying) {
-              _playRingtone();
-            }
-          },
-        );
-        _isPlaying = true;
-        log("Started playing ringtone");
-      } catch (e) {
-        log("Error playing ringtone: $e");
-      }
+      log("Started playing ringtone");
+    } catch (e) {
+      log("Error playing ringtone: $e");
     }
   }
 
@@ -89,6 +91,7 @@ class TwilioService {
   Future<void> _stopRingtone() async {
     if (_isPlaying) {
       try {
+        _isPlaying = false;
         await _soundPlayer.stopPlayer();
         _isPlaying = false;
         log("Stopped playing ringtone");
@@ -101,6 +104,8 @@ class TwilioService {
 
   /// Make a call
   Future<void> makeCall(String from, String toNumber) async {
+    _isPlaying = false;
+
     try {
       await TwilioVoice.instance.call.place(
         from: from, // Twilio Number 15093611979
@@ -128,8 +133,6 @@ class TwilioService {
   void _setupListeners(BuildContext context) {
     // Listen for Twilio Call Events
     TwilioVoice.instance.callEventsListener.listen((event) {
-      log("Call Event: $event");
-
       switch (event) {
         case CallEvent.incoming:
           log("Incoming Call detected!");
@@ -147,6 +150,7 @@ class TwilioService {
           _playEndCallSound(); // Play end call sound
           break;
         case CallEvent.ringing:
+          _isPlaying = true;
           log("Phone is Ringing!");
           _playRingtone(); // Play ringtone when phone is ringing
           break;
@@ -160,6 +164,7 @@ class TwilioService {
           break;
         default:
           log("⚠️ Other Event: $event");
+          _isPlaying = false;
       }
     });
   }
