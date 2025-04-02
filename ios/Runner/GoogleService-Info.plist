@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyDPp8Xx8o4O4v4OghMpC_R5a45DaZnSVC4</string>
+	<string>AIzaSyBvyHUVKkoyp3iFNERGlfhqIewf-A-OW9M</string>
 	<key>GCM_SENDER_ID</key>
-	<string>230438338034</string>
+	<string>656416273390</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.gbpnDealer</string>
+	<string>com.gbpn.gbpnmobile</string>
 	<key>PROJECT_ID</key>
-	<string>gbpd-8468e</string>
+	<string>mobile-app-d246c</string>
 	<key>STORAGE_BUCKET</key>
-	<string>gbpd-8468e.firebasestorage.app</string>
+	<string>mobile-app-d246c.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:230438338034:ios:5741f00926e8659e89ff6b</string>
+	<string>1:656416273390:ios:d0947aea1c50281d2ed4ff</string>
 </dict>
 </plist>

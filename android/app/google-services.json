@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:656416273390:android:65accf53ff893e0b2ed4ff",
+        "mobilesdk_app_id": "1:656416273390:android:adb3545d82da059d2ed4ff",
         "android_client_info": {
-          "package_name": "com.example.gbpn_dealer"
+          "package_name": "com.gbpn.gbpnmobile"
         }
       },
       "oauth_client": [],

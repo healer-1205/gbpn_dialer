@@ -1,4 +1,4 @@
-package com.example.gbpn_dealer
+package com.gbpn.gbpnmobile
 
 import io.flutter.embedding.android.FlutterActivity
 
