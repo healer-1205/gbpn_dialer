@@ -162,6 +162,10 @@ class TwilioService {
           _stopRingtone(); // Stop ringtone when call is declined
           _playEndCallSound(); // Play end call sound when call is declined
           break;
+        case CallEvent.speakerOn:
+        case CallEvent.speakerOff:
+          log("🔊 Speaker Event: $event");
+          break;
         default:
           log("⚠️ Other Event: $event");
           _isPlaying = false;
