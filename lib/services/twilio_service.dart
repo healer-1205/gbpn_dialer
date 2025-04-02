@@ -15,6 +15,7 @@ class TwilioService {
   final FlutterSoundPlayer _soundPlayer = FlutterSoundPlayer();
   final FlutterSoundPlayer _endCallSoundPlayer = FlutterSoundPlayer();
   bool _isPlaying = false;
+  bool _isCallConnected = false;
 
   factory TwilioService() {
     return _instance;
@@ -63,8 +64,6 @@ class TwilioService {
     return asset.buffer.asUint8List();
   }
 
-  int _ringCount = 0;
-
   /// Play ringtone sound
   Future<void> _playRingtone() async {
     if (!_isPlaying) {
@@ -105,7 +104,7 @@ class TwilioService {
   /// Make a call
   Future<void> makeCall(String from, String toNumber) async {
     _isPlaying = false;
-
+    _isCallConnected = false;
     try {
       await TwilioVoice.instance.call.place(
         from: from, // Twilio Number 15093611979
@@ -165,6 +164,9 @@ class TwilioService {
         case CallEvent.speakerOn:
         case CallEvent.speakerOff:
           log("🔊 Speaker Event: $event");
+          if (_isCallConnected) break;
+          _playRingtone();
+
           break;
         default:
           log("⚠️ Other Event: $event");
