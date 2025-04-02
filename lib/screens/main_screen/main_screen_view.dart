@@ -199,7 +199,7 @@ class _MainScreenViewState extends State<MainScreenView> {
   }
 
   /// Make a call using Twilio
-  void _makeCall(String phoneNumber) async {
+  void _makeCall(String phoneNumber, {String? name}) async {
     if (phoneNumber.isEmpty) return;
 
     try {
@@ -220,7 +220,7 @@ class _MainScreenViewState extends State<MainScreenView> {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return CallScreen(
               phoneNumber: phoneNumber,
-              callerName: 'Unknown',
+              callerName: name ?? phoneNumber,
               twilioService: _twilioService,
             );
           }));

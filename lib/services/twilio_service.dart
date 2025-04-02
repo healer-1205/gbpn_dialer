@@ -201,6 +201,10 @@ class TwilioService {
     await TwilioVoice.instance.call.toggleSpeaker(value);
   }
 
+  Future<void> toggleBluetooth(bool value) async {
+    await TwilioVoice.instance.call.toggleBluetooth(bluetoothOn: value);
+  }
+
   Future<void> muteCall(bool value) async {
     await TwilioVoice.instance.call.toggleMute(value);
   }

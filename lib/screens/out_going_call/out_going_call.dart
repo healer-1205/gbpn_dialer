@@ -23,6 +23,7 @@ class _CallScreenState extends State<CallScreen>
     with SingleTickerProviderStateMixin {
   late TwilioService _twilioService;
   bool _isSpeakerOn = false;
+  bool _isBluetoothOn = false;
   bool _isMuted = false;
   bool _isKeypadVisible = false;
   bool _isConnected = false;
@@ -86,6 +87,7 @@ class _CallScreenState extends State<CallScreen>
   void _toggleSpeaker() async {
     setState(() {
       _isSpeakerOn = !_isSpeakerOn;
+      _isBluetoothOn = false;
     });
     await _twilioService.toggleSpeaker(_isSpeakerOn);
   }
@@ -101,6 +103,14 @@ class _CallScreenState extends State<CallScreen>
     setState(() {
       _isKeypadVisible = !_isKeypadVisible;
     });
+  }
+
+  void _toggleBluetooth() async {
+    setState(() {
+      _isBluetoothOn = !_isBluetoothOn;
+      _isSpeakerOn = false;
+    });
+    await _twilioService.toggleBluetooth(_isBluetoothOn);
   }
 
   /// Setup call event listeners
@@ -321,6 +331,12 @@ class _CallScreenState extends State<CallScreen>
                 label: "speaker",
                 isActive: _isSpeakerOn,
                 onTap: _toggleSpeaker,
+              ),
+              _buildControlButton(
+                icon: Icons.bluetooth,
+                label: "bluetooth",
+                isActive: _isBluetoothOn,
+                onTap: _toggleBluetooth,
               ),
             ],
           ),

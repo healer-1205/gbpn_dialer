@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({required this.onMakeCall, super.key});
-  final ValueChanged<String> onMakeCall;
+  final Function(String phoneNumber, {String? name}) onMakeCall;
   @override
   State<ContactScreen> createState() => _ContactScreenState();
 }
@@ -47,7 +47,8 @@ class _ContactScreenState extends State<ContactScreen> {
                       );
                       return;
                     }
-                    widget.onMakeCall(contact.phones.first.number);
+                    widget.onMakeCall(contact.phones.first.number,
+                        name: contact.displayName);
                   },
                 );
               },
