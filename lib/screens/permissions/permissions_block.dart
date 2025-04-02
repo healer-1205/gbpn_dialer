@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gbpn_dealer/utils/utils.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twilio_voice/twilio_voice.dart';
 
@@ -26,6 +27,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasMicPermission = false;
 
   set setMicPermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasMicPermission = value;
     });
@@ -34,6 +36,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasRegisteredPhoneAccount = false;
 
   set setPhoneAccountRegistered(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasRegisteredPhoneAccount = value;
     });
@@ -42,6 +45,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasCallPhonePermission = false;
 
   set setCallPhonePermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasCallPhonePermission = value;
     });
@@ -50,6 +54,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasManageCallsPermission = false;
 
   set setManageCallsPermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasManageCallsPermission = value;
     });
@@ -58,6 +63,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _isPhoneAccountEnabled = false;
 
   set setIsPhoneAccountEnabled(bool value) {
+    if (!mounted) return;
     setState(() {
       _isPhoneAccountEnabled = value;
     });
@@ -66,6 +72,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasReadPhoneStatePermission = false;
 
   set setReadPhoneStatePermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasReadPhoneStatePermission = value;
     });
@@ -74,6 +81,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasReadPhoneNumbersPermission = false;
 
   set setReadPhoneNumbersPermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasReadPhoneNumbersPermission = value;
     });
@@ -82,8 +90,18 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
   bool _hasBackgroundPermissions = false;
 
   set setBackgroundPermission(bool value) {
+    if (!mounted) return;
     setState(() {
       _hasBackgroundPermissions = value;
+    });
+  }
+
+  bool _hasIgnoreBatteryOptimizationPermission = false;
+
+  set setIgnoreBatteryOptimizationPermission(bool value) {
+    if (!mounted) return;
+    setState(() {
+      _hasIgnoreBatteryOptimizationPermission = value;
     });
   }
 
@@ -96,6 +114,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
     _hasReadPhoneStatePermission,
     _hasReadPhoneNumbersPermission,
     _hasBackgroundPermissions,
+    _hasIgnoreBatteryOptimizationPermission,
   ];
 
   @override
@@ -130,6 +149,12 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
     _tv
         .isPhoneAccountEnabled()
         .then((value) => setIsPhoneAccountEnabled = value);
+
+    // Check battery optimization permission
+    if (!kIsWeb && Platform.isAndroid) {
+      Permission.ignoreBatteryOptimizations.status.then((status) =>
+          setIgnoreBatteryOptimizationPermission = status.isGranted);
+    }
   }
 
   @override
@@ -148,6 +173,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
             _isPhoneAccountEnabled,
             _hasReadPhoneStatePermission,
             _hasReadPhoneNumbersPermission,
+            _hasIgnoreBatteryOptimizationPermission,
           ];
 
           if (_allPermissions.any(
@@ -164,7 +190,9 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
                 hasCallPhonePermission: _hasCallPhonePermission,
                 hasManageCallsPermission: _hasManageCallsPermission,
                 hasRegisteredPhoneAccount: _hasRegisteredPhoneAccount,
-                isPhoneAccountEnabled: _isPhoneAccountEnabled);
+                isPhoneAccountEnabled: _isPhoneAccountEnabled,
+                hasIgnoreBatteryOptimizationPermission:
+                    _hasIgnoreBatteryOptimizationPermission);
             Navigator.of(context).pop(true);
           }
         },
@@ -269,6 +297,23 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
 
                   // if android
                   if (!kIsWeb && Platform.isAndroid)
+                    PermissionTile(
+                      icon: Icons.battery_alert,
+                      title: "Ignore Battery Optimization",
+                      granted: _hasIgnoreBatteryOptimizationPermission,
+                      onRequestPermission: () async {
+                        if (!_hasIgnoreBatteryOptimizationPermission) {
+                          await Permission.ignoreBatteryOptimizations.request();
+                          final status = await Permission
+                              .ignoreBatteryOptimizations.status;
+                          setIgnoreBatteryOptimizationPermission =
+                              status.isGranted;
+                        }
+                      },
+                    ),
+
+                  // if android
+                  if (!kIsWeb && Platform.isAndroid)
                     ListTile(
                       enabled: _hasRegisteredPhoneAccount,
                       dense: true,
@@ -282,6 +327,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
                                 !_isPhoneAccountEnabled
                             ? () async {
                                 if (_isPhoneAccountEnabled) {
+                                  if (!mounted) return;
                                   setState(() {
                                     _updatePermissions();
                                   });
@@ -315,7 +361,9 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
                                   _hasManageCallsPermission,
                               hasRegisteredPhoneAccount:
                                   _hasRegisteredPhoneAccount,
-                              isPhoneAccountEnabled: _isPhoneAccountEnabled);
+                              isPhoneAccountEnabled: _isPhoneAccountEnabled,
+                              hasIgnoreBatteryOptimizationPermission:
+                                  _hasIgnoreBatteryOptimizationPermission);
                           return;
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -349,6 +397,8 @@ class PermissionState {
   static const String _manageCallsKey = 'manage_calls_permission';
   static const String _phoneAccountKey = 'phone_account_permission';
   static const String _accountEnabledKey = 'account_enabled';
+  static const String _ignoreBatteryOptimizationKey =
+      'ignore_battery_optimization';
 
   static Future<void> savePermissionState({
     required bool hasMicPermission,
@@ -358,6 +408,7 @@ class PermissionState {
     required bool hasManageCallsPermission,
     required bool hasRegisteredPhoneAccount,
     required bool isPhoneAccountEnabled,
+    required bool hasIgnoreBatteryOptimizationPermission,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_micPermissionKey, hasMicPermission);
@@ -367,6 +418,8 @@ class PermissionState {
     await prefs.setBool(_manageCallsKey, hasManageCallsPermission);
     await prefs.setBool(_phoneAccountKey, hasRegisteredPhoneAccount);
     await prefs.setBool(_accountEnabledKey, isPhoneAccountEnabled);
+    await prefs.setBool(
+        _ignoreBatteryOptimizationKey, hasIgnoreBatteryOptimizationPermission);
   }
 
   static Future<bool> checkAllPermissions() async {
@@ -402,13 +455,26 @@ class PermissionState {
     final isPhoneAccountEnabled = await _tv.isPhoneAccountEnabled();
     await prefs.setBool(_accountEnabledKey, isPhoneAccountEnabled);
 
+    // Check and save battery optimization permission
+    bool hasIgnoreBatteryOptimizationPermission = false;
+    if (!kIsWeb && Platform.isAndroid) {
+      final status = await Permission.ignoreBatteryOptimizations.status;
+      hasIgnoreBatteryOptimizationPermission = status.isGranted;
+      await prefs.setBool(_ignoreBatteryOptimizationKey,
+          hasIgnoreBatteryOptimizationPermission);
+    } else {
+      await prefs.setBool(_ignoreBatteryOptimizationKey, true);
+      hasIgnoreBatteryOptimizationPermission = true;
+    }
+
     return hasMicPermission &&
         hasReadPhoneStatePermission &&
         hasReadPhoneNumbersPermission &&
         hasCallPhonePermission &&
         hasManageCallsPermission &&
         hasRegisteredPhoneAccount &&
-        isPhoneAccountEnabled;
+        isPhoneAccountEnabled &&
+        hasIgnoreBatteryOptimizationPermission;
   }
 
   static Future<bool> getStoredPermissionState() async {
@@ -420,6 +486,7 @@ class PermissionState {
         prefs.getBool(_callPhoneKey) == true &&
         prefs.getBool(_manageCallsKey) == true &&
         prefs.getBool(_phoneAccountKey) == true &&
-        prefs.getBool(_accountEnabledKey) == true;
+        prefs.getBool(_accountEnabledKey) == true &&
+        prefs.getBool(_ignoreBatteryOptimizationKey) == true;
   }
 }

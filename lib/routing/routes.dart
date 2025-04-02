@@ -19,8 +19,6 @@ class Routes {
         return MaterialPageRoute(builder: (_) => const SignInScreen());
       case '/main':
         return MaterialPageRoute(builder: (_) => const MainScreenView());
-      case '/dialpad':
-        return MaterialPageRoute(builder: (_) => const DialpadScreen());
       case '/permission_block':
         return MaterialPageRoute(builder: (_) => const PermissionsBlock());
       case '/settings':

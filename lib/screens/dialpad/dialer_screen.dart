@@ -1,180 +1,35 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gbpn_dealer/screens/dialpad/active_number_reminder_dialog.dart';
-import 'package:gbpn_dealer/screens/permissions/permissions_block.dart'
-    show PermissionState;
 import 'package:gbpn_dealer/utils/extension.dart';
-import 'package:gbpn_dealer/utils/utils.dart';
-import 'package:twilio_voice/twilio_voice.dart';
-
-import '../../services/storage_service.dart';
-import '../../services/twilio_service.dart';
 
 class DialpadScreen extends StatefulWidget {
-  const DialpadScreen({super.key});
-
+  const DialpadScreen(
+      {required this.phoneNumberController,
+      required this.onMakeCall,
+      super.key});
+  final TextEditingController phoneNumberController;
+  final ValueChanged<String> onMakeCall;
   @override
   State<DialpadScreen> createState() => _DialpadScreenState();
 }
 
 class _DialpadScreenState extends State<DialpadScreen> {
-  final TextEditingController _controller = TextEditingController();
+  late TextEditingController _controller;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
-  final TwilioService _twilioService = TwilioService(); // Singleton Instance
-  late String twilioToken = "";
-  StreamSubscription<CallEvent>? _callEventSubscription; // Store event listener
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _focusNode.dispose();
+
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    _controller.text = "";
-    //requestPermissions();
-    Future.delayed(
-      Duration(seconds: 1),
-      () {
-        _fetchTwilioToken();
-      },
-    );
-  }
-
-  /// Fetches and initializes Twilio Token
-  Future<void> _fetchTwilioToken() async {
-    try {
-      final token = await StorageService().getTwilioAccessToken();
-      if (token != null && !_twilioService.isTokenExpired(token)) {
-        setState(() {
-          twilioToken = token;
-        });
-        _initializeTwilio();
-      } else {
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/signin');
-        }
-      }
-    } catch (e) {
-      print("Error fetching Twilio token: $e");
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/signin');
-      }
-    }
-  }
-
-  /// Initialize Twilio Service
-  Future<void> _initializeTwilio() async {
-    try {
-      final deviceToken = await StorageService().getFCMToken();
-      await _twilioService.initialize(twilioToken, deviceToken!, context);
-
-      _setupCallListeners();
-      _permissionRequiredDialog();
-    } catch (e) {
-      printDebug("Error initializing Twilio: $e");
-    }
-  }
-
-  Future<void> _permissionRequiredDialog() async {
-    if (await PermissionState.checkAllPermissions()) return;
-    await showAdaptiveDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: const Text(
-            "Permission Required",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.security,
-                size: 48,
-                color: Colors.blue,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                "To make calls, we need access to your phone permissions. Please grant the required permissions to continue.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                "Cancel",
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () async {
-                await Navigator.pushNamed(context, '/permission_block');
-                Navigator.pop(context);
-              },
-              child: const Text("Proceed"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  /// Setup call event listeners
-  void _setupCallListeners() {
-    _callEventSubscription = _twilioService.callEvents.listen((event) {
-      if (!mounted) return;
-
-      setState(() {
-        print("Call event received: $event");
-      });
-
-      switch (event) {
-        case CallEvent.callEnded:
-          _controller.text = '';
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context); // Close Outgoing Call Screen when call ends
-          }
-          break;
-        case CallEvent.connected:
-          print('Call Connected');
-          break;
-        case CallEvent.incoming:
-          print('Incoming call');
-          break;
-        default:
-          break;
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _callEventSubscription?.cancel();
-    _controller.dispose();
-    _scrollController.dispose();
-    _focusNode.dispose();
-    super.dispose();
+    _controller = widget.phoneNumberController;
   }
 
   void _onNumberPressed(String number) {
@@ -370,11 +225,10 @@ class _DialpadScreenState extends State<DialpadScreen> {
 
   Widget _buildCallButton() {
     IconData icon = Icons.call;
-    Color buttonColor = Colors.green;
 
     return GestureDetector(
       // onTap: _isCallActive ? _hangUpCall : _makeCall,
-      onTap: _makeCall,
+      onTap: () => widget.onMakeCall(_controller.text),
       child: Container(
         height: context.screenWidth / 5.5,
         width: context.screenWidth / 5.5,
@@ -408,87 +262,9 @@ class _DialpadScreenState extends State<DialpadScreen> {
     );
   }
 
-  Widget _buildBottomNavigation() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey, width: 0.5)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem("Keypad", true),
-          _buildNavItem("Recents", false),
-          _buildNavItem("Contacts", false),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(String text, bool isSelected) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(text,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.black : Colors.grey)),
-        if (isSelected)
-          Container(
-              width: 40,
-              height: 2,
-              color: Colors.black,
-              margin: const EdgeInsets.only(top: 4)),
-      ],
-    );
-  }
-
   void scrollToEndPosition() {
     _scrollController.animateTo(_scrollController.position.maxScrollExtent + 13,
         curve: Curves.ease, duration: Duration(milliseconds: 100));
     _focusNode.requestFocus();
-  }
-
-  /// Make a call using Twilio
-  void _makeCall() async {
-    if (_controller.text.isEmpty) return;
-
-    try {
-      bool hasPermission = await PermissionState.checkAllPermissions();
-      if (!hasPermission) {
-        printDebug("⚠️ No Phone Account Registered! Registering now...");
-        await _permissionRequiredDialog();
-      }
-
-      if (!_twilioService.isTokenExpired(twilioToken)) {
-        final fromNumber = await StorageService().getActivePhoneNumber();
-        if (fromNumber == null) {
-          _showActiveNumberReminder(context);
-          return;
-        }
-        // Place the call
-        await _twilioService.makeCall(fromNumber.phoneNumber, _controller.text);
-      } else {
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/signin');
-        }
-      }
-    } catch (e) {
-      printDebug("Call failed: $e");
-    }
-  }
-
-  // Usage example:
-  void _showActiveNumberReminder(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => ActiveNumberReminderDialog(
-        onNavigateToSettings: () {
-          // Navigate to settings screen
-          Navigator.pushNamed(context, '/settings');
-        },
-      ),
-    );
   }
 }
