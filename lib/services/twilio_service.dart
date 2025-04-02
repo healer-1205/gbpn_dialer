@@ -192,9 +192,21 @@ class TwilioService {
   }
 
   /// Decline the Call
-  Future<void> declineCall() async {
+  Future<void> hangUpCall() async {
     await TwilioVoice.instance.call.hangUp();
     await _stopRingtone(); // Ensure ringtone is stopped when call is declined
+  }
+
+  Future<void> toggleSpeaker(bool value) async {
+    await TwilioVoice.instance.call.toggleSpeaker(value);
+  }
+
+  Future<void> muteCall(bool value) async {
+    await TwilioVoice.instance.call.toggleMute(value);
+  }
+
+  Future<void> sendDigits(String value) async {
+    await TwilioVoice.instance.call.sendDigits(value);
   }
 
   /// Play end call sound

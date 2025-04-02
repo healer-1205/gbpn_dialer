@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -40,8 +42,9 @@ class FirebaseService {
 
   /// Get the FCM token
   Future<String?> getFCMToken() async {
-    String? fcmToken =
-        await _storage.getFCMToken() ?? await _firebaseMessaging.getToken();
+    String? fcmToken = Platform.isIOS
+        ? await FirebaseMessaging.instance.getAPNSToken()
+        : await _storage.getFCMToken() ?? await _firebaseMessaging.getToken();
     await _storage.saveFCMToken(fcmToken!);
     // return await _firebaseMessaging.getToken();
     return fcmToken;

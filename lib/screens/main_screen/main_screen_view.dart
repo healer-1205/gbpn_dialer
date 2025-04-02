@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gbpn_dealer/screens/dialpad/active_number_reminder_dialog.dart';
+import 'package:gbpn_dealer/screens/out_going_call/out_going_call.dart';
 import 'package:gbpn_dealer/screens/permissions/permissions_block.dart';
 import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:gbpn_dealer/services/twilio_service.dart';
@@ -213,6 +215,15 @@ class _MainScreenViewState extends State<MainScreenView> {
         if (fromNumber == null) {
           _showActiveNumberReminder(context);
           return;
+        }
+        if (Platform.isIOS) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return CallScreen(
+              phoneNumber: phoneNumber,
+              callerName: 'Unknown',
+              twilioService: _twilioService,
+            );
+          }));
         }
         // Place the call
         await _twilioService.makeCall(fromNumber.phoneNumber, phoneNumber);
