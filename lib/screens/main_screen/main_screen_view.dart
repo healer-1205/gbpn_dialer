@@ -73,7 +73,6 @@ class _MainScreenViewState extends State<MainScreenView> {
         }
       }
     } catch (e) {
-      print("Error fetching Twilio token: $e");
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/signin');
       }
@@ -84,6 +83,7 @@ class _MainScreenViewState extends State<MainScreenView> {
   Future<void> _initializeTwilio() async {
     try {
       final deviceToken = await StorageService().getFCMToken();
+      if (!mounted) return;
       await _twilioService.initialize(twilioToken, deviceToken!, context);
 
       _setupCallListeners();
@@ -97,11 +97,6 @@ class _MainScreenViewState extends State<MainScreenView> {
   void _setupCallListeners() {
     _callEventSubscription = _twilioService.callEvents.listen((event) {
       if (!mounted) return;
-
-      setState(() {
-        print("Call event received: $event");
-      });
-
       switch (event) {
         case CallEvent.callEnded:
           _controller.text = '';
@@ -136,6 +131,7 @@ class _MainScreenViewState extends State<MainScreenView> {
 
   Future<void> _permissionRequiredDialog() async {
     if (await PermissionState.checkAllPermissions()) return;
+    if (!mounted) return;
     await showAdaptiveDialog(
       context: context,
       barrierDismissible: false,
@@ -212,6 +208,7 @@ class _MainScreenViewState extends State<MainScreenView> {
 
       if (!_twilioService.isTokenExpired(twilioToken)) {
         final fromNumber = await StorageService().getActivePhoneNumber();
+        if (!mounted) return;
         if (fromNumber == null) {
           _showActiveNumberReminder(context);
           return;

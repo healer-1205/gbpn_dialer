@@ -54,8 +54,7 @@ class FirebaseService {
   void _handleTokenRefresh() {
     _firebaseMessaging.onTokenRefresh.listen((newToken) async {
       debugPrint("FCM Token refreshed: $newToken");
-      await _storage.saveFCMToken(newToken!);
-      // TODO: Send this token to your server if needed
+      await _storage.saveFCMToken(newToken);
     });
   }
 
@@ -63,7 +62,6 @@ class FirebaseService {
   void _listenToMessages() {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       debugPrint("🔔 Notification tapped: ${message.toString()}");
-      // TODO: Navigate user to a specific screen if required
     });
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
