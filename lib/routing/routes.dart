@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gbpn_dealer/screens/incoming_screen/incoming_call_screen.dart';
 import 'package:gbpn_dealer/screens/permissions/permissions_block.dart';
 import 'package:gbpn_dealer/screens/settings/settings_screen.dart';
-import '../screens/dialpad/dialer_screen.dart';
 import '../screens/intro/screen.dart';
 import '../screens/main_screen/main_screen_view.dart';
 import '../screens/signin/screen.dart';
