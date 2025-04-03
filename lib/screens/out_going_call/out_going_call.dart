@@ -26,7 +26,7 @@ class _CallScreenState extends State<CallScreen>
   bool _isBluetoothOn = false;
   bool _isMuted = false;
   bool _isKeypadVisible = false;
-  bool _isConnected = false;
+  final bool _isConnected = false;
   Timer? _callTimer;
   Duration _callDuration = Duration.zero;
   String _callTime = "00:00";
@@ -81,6 +81,7 @@ class _CallScreenState extends State<CallScreen>
 
   void _endCall() async {
     await _twilioService.hangUpCall();
+    if (!mounted) return;
     Navigator.pop(context);
   }
 
