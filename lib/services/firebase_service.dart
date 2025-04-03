@@ -47,7 +47,6 @@ class FirebaseService {
         : await _storage.getFCMToken() ?? await _firebaseMessaging.getToken();
     await _storage.saveFCMToken(fcmToken!);
     // return await _firebaseMessaging.getToken();
-    debugPrint("FCM Token: $fcmToken");
     return fcmToken;
   }
 
