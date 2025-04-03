@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
@@ -157,7 +156,7 @@ class TwilioService {
           log("Reconnecting Call...");
           break;
         case CallEvent.declined:
-          log("🚫 Call Declined");
+          log("Call Declined");
           _stopRingtone(); // Stop ringtone when call is declined
           _playEndCallSound(); // Play end call sound when call is declined
           break;
@@ -166,10 +165,9 @@ class TwilioService {
           log("🔊 Speaker Event: $event");
           if (_isCallConnected) break;
           _playRingtone();
-
           break;
         default:
-          log("⚠️ Other Event: $event");
+          log("Other Event: $event");
           _isPlaying = false;
       }
     });
