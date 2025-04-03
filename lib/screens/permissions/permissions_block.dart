@@ -132,7 +132,7 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
     _tv
         .hasReadPhoneNumbersPermission()
         .then((value) => setReadPhoneNumbersPermission = value);
-    if (firebaseEnabled && Firebase.apps.isNotEmpty) {
+    if (Firebase.apps.isNotEmpty) {
       FirebaseMessaging.instance.requestPermission().then((value) =>
           setBackgroundPermission =
               value.authorizationStatus == AuthorizationStatus.authorized);
@@ -196,187 +196,192 @@ class _PermissionsBlockState extends State<PermissionsBlock> {
             Navigator.of(context).pop(true);
           }
         },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // permissions
-              Text("Permissions",
-                  style: Theme.of(context).textTheme.titleLarge),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // permissions
+                Text("Permissions",
+                    style: Theme.of(context).textTheme.titleLarge),
 
-              Column(
-                children: [
-                  PermissionTile(
-                    icon: Icons.mic,
-                    title: "Microphone",
-                    granted: _hasMicPermission,
-                    onRequestPermission: () async {
-                      await _tv.requestMicAccess();
-                      setMicPermission = await _tv.hasMicAccess();
-                    },
-                  ),
-
-                  if (firebaseEnabled && Firebase.apps.isNotEmpty)
+                Column(
+                  children: [
                     PermissionTile(
-                      icon: Icons.notifications,
-                      title: "Notifications",
-                      granted: _hasBackgroundPermissions,
+                      icon: Icons.mic,
+                      title: "Microphone",
+                      granted: _hasMicPermission,
                       onRequestPermission: () async {
-                        await FirebaseMessaging.instance.requestPermission();
-                        final settings = await FirebaseMessaging.instance
-                            .getNotificationSettings();
-                        setBackgroundPermission =
-                            settings.authorizationStatus ==
-                                AuthorizationStatus.authorized;
+                        await _tv.requestMicAccess();
+                        setMicPermission = await _tv.hasMicAccess();
                       },
                     ),
 
-                  // if android
-                  if (!kIsWeb && Platform.isAndroid)
-                    PermissionTile(
-                      icon: Icons.phone,
-                      title: "Read Phone State",
-                      granted: _hasReadPhoneStatePermission,
-                      onRequestPermission: () async {
-                        await _tv.requestReadPhoneStatePermission();
-                        setReadPhoneStatePermission =
-                            await _tv.hasReadPhoneStatePermission();
-                      },
-                    ),
-
-                  // if android
-                  if (!kIsWeb && Platform.isAndroid)
-                    PermissionTile(
-                      icon: Icons.phone,
-                      title: "Read Phone Numbers",
-                      granted: _hasReadPhoneNumbersPermission,
-                      onRequestPermission: () async {
-                        await _tv.requestReadPhoneNumbersPermission();
-                        setReadPhoneNumbersPermission =
-                            await _tv.hasReadPhoneNumbersPermission();
-                      },
-                    ),
-
-                  // if android
-                  if (!kIsWeb && Platform.isAndroid)
-                    PermissionTile(
-                      icon: Icons.call_made,
-                      title: "Call Phone",
-                      granted: _hasCallPhonePermission,
-                      onRequestPermission: () async {
-                        await _tv.requestCallPhonePermission();
-                        setCallPhonePermission =
-                            await _tv.hasCallPhonePermission();
-                      },
-                    ),
-
-                  // if android
-                  if (!kIsWeb && Platform.isAndroid)
-                    PermissionTile(
-                      icon: Icons.call_received,
-                      title: "Manage Calls",
-                      granted: _hasManageCallsPermission,
-                      onRequestPermission: () async {
-                        await _tv.requestManageOwnCallsPermission();
-                        setManageCallsPermission =
-                            await _tv.hasManageOwnCallsPermission();
-                      },
-                    ),
-
-                  // if android
-                  if (!kIsWeb && Platform.isAndroid)
-                    PermissionTile(
-                      icon: Icons.phonelink_setup,
-                      title: "Phone Account",
-                      granted: _hasRegisteredPhoneAccount,
-                      onRequestPermission: () async {
-                        await _tv.registerPhoneAccount();
-                        setPhoneAccountRegistered =
-                            await _tv.hasRegisteredPhoneAccount();
-                      },
-                    ),
-
-                  // if android
-                  if (!kIsWeb && Platform.isAndroid)
-                    PermissionTile(
-                      icon: Icons.battery_alert,
-                      title: "Ignore Battery Optimization",
-                      granted: _hasIgnoreBatteryOptimizationPermission,
-                      onRequestPermission: () async {
-                        if (!_hasIgnoreBatteryOptimizationPermission) {
-                          await Permission.ignoreBatteryOptimizations.request();
-                          final status = await Permission
-                              .ignoreBatteryOptimizations.status;
-                          setIgnoreBatteryOptimizationPermission =
-                              status.isGranted;
-                        }
-                      },
-                    ),
-
-                  // if android
-                  if (!kIsWeb && Platform.isAndroid)
-                    ListTile(
-                      enabled: _hasRegisteredPhoneAccount,
-                      dense: true,
-                      leading: const Icon(Icons.phonelink_lock_outlined),
-                      title: const Text("Phone Account Status"),
-                      subtitle: Text(_hasRegisteredPhoneAccount
-                          ? (_isPhoneAccountEnabled ? "Enabled" : "Not Enabled")
-                          : "Not Registered"),
-                      trailing: ElevatedButton(
-                        onPressed: _hasRegisteredPhoneAccount &&
-                                !_isPhoneAccountEnabled
-                            ? () async {
-                                if (_isPhoneAccountEnabled) {
-                                  if (!mounted) return;
-                                  setState(() {
-                                    _updatePermissions();
-                                  });
-                                  return;
-                                }
-                                await _tv.openPhoneAccountSettings();
-                                _isPhoneAccountEnabled =
-                                    await _tv.isPhoneAccountEnabled();
-                                _updatePermissions();
-                              }
-                            : null,
-                        child: const Text("Open Settings"),
+                    if (Firebase.apps.isNotEmpty)
+                      PermissionTile(
+                        icon: Icons.notifications,
+                        title: "Notifications",
+                        granted: _hasBackgroundPermissions,
+                        onRequestPermission: () async {
+                          await FirebaseMessaging.instance.requestPermission();
+                          final settings = await FirebaseMessaging.instance
+                              .getNotificationSettings();
+                          setBackgroundPermission =
+                              settings.authorizationStatus ==
+                                  AuthorizationStatus.authorized;
+                        },
                       ),
-                    ),
-                  Align(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        _isPhoneAccountEnabled =
-                            await _tv.isPhoneAccountEnabled();
-                        _updatePermissions();
-                        if (_isPhoneAccountEnabled) {
-                          Navigator.pop(context, true);
-                          PermissionState.savePermissionState(
-                              hasMicPermission: _hasMicPermission,
-                              hasReadPhoneStatePermission:
-                                  _hasReadPhoneStatePermission,
-                              hasReadPhoneNumbersPermission:
-                                  _hasReadPhoneNumbersPermission,
-                              hasCallPhonePermission: _hasCallPhonePermission,
-                              hasManageCallsPermission:
-                                  _hasManageCallsPermission,
-                              hasRegisteredPhoneAccount:
-                                  _hasRegisteredPhoneAccount,
-                              isPhoneAccountEnabled: _isPhoneAccountEnabled,
-                              hasIgnoreBatteryOptimizationPermission:
-                                  _hasIgnoreBatteryOptimizationPermission);
-                          return;
-                        }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Please grant all permissions")),
-                        );
-                      },
-                      child: Text('Go back'),
-                    ),
-                  )
-                ],
-              ),
-            ],
+
+                    // if android
+                    if (!kIsWeb && Platform.isAndroid)
+                      PermissionTile(
+                        icon: Icons.phone,
+                        title: "Read Phone State",
+                        granted: _hasReadPhoneStatePermission,
+                        onRequestPermission: () async {
+                          await _tv.requestReadPhoneStatePermission();
+                          setReadPhoneStatePermission =
+                              await _tv.hasReadPhoneStatePermission();
+                        },
+                      ),
+
+                    // if android
+                    if (!kIsWeb && Platform.isAndroid)
+                      PermissionTile(
+                        icon: Icons.phone,
+                        title: "Read Phone Numbers",
+                        granted: _hasReadPhoneNumbersPermission,
+                        onRequestPermission: () async {
+                          await _tv.requestReadPhoneNumbersPermission();
+                          setReadPhoneNumbersPermission =
+                              await _tv.hasReadPhoneNumbersPermission();
+                        },
+                      ),
+
+                    // if android
+                    if (!kIsWeb && Platform.isAndroid)
+                      PermissionTile(
+                        icon: Icons.call_made,
+                        title: "Call Phone",
+                        granted: _hasCallPhonePermission,
+                        onRequestPermission: () async {
+                          await _tv.requestCallPhonePermission();
+                          setCallPhonePermission =
+                              await _tv.hasCallPhonePermission();
+                        },
+                      ),
+
+                    // if android
+                    if (!kIsWeb && Platform.isAndroid)
+                      PermissionTile(
+                        icon: Icons.call_received,
+                        title: "Manage Calls",
+                        granted: _hasManageCallsPermission,
+                        onRequestPermission: () async {
+                          await _tv.requestManageOwnCallsPermission();
+                          setManageCallsPermission =
+                              await _tv.hasManageOwnCallsPermission();
+                        },
+                      ),
+
+                    // if android
+                    if (!kIsWeb && Platform.isAndroid)
+                      PermissionTile(
+                        icon: Icons.phonelink_setup,
+                        title: "Phone Account",
+                        granted: _hasRegisteredPhoneAccount,
+                        onRequestPermission: () async {
+                          await _tv.registerPhoneAccount();
+                          setPhoneAccountRegistered =
+                              await _tv.hasRegisteredPhoneAccount();
+                        },
+                      ),
+
+                    // if android
+                    if (!kIsWeb && Platform.isAndroid)
+                      PermissionTile(
+                        icon: Icons.battery_alert,
+                        title: "Ignore Battery Optimization",
+                        granted: _hasIgnoreBatteryOptimizationPermission,
+                        onRequestPermission: () async {
+                          if (!_hasIgnoreBatteryOptimizationPermission) {
+                            await Permission.ignoreBatteryOptimizations
+                                .request();
+                            final status = await Permission
+                                .ignoreBatteryOptimizations.status;
+                            setIgnoreBatteryOptimizationPermission =
+                                status.isGranted;
+                          }
+                        },
+                      ),
+
+                    // if android
+                    if (!kIsWeb && Platform.isAndroid)
+                      ListTile(
+                        enabled: _hasRegisteredPhoneAccount,
+                        dense: true,
+                        leading: const Icon(Icons.phonelink_lock_outlined),
+                        title: const Text("Phone Account Status"),
+                        subtitle: Text(_hasRegisteredPhoneAccount
+                            ? (_isPhoneAccountEnabled
+                                ? "Enabled"
+                                : "Not Enabled")
+                            : "Not Registered"),
+                        trailing: ElevatedButton(
+                          onPressed: _hasRegisteredPhoneAccount &&
+                                  !_isPhoneAccountEnabled
+                              ? () async {
+                                  if (_isPhoneAccountEnabled) {
+                                    if (!mounted) return;
+                                    setState(() {
+                                      _updatePermissions();
+                                    });
+                                    return;
+                                  }
+                                  await _tv.openPhoneAccountSettings();
+                                  _isPhoneAccountEnabled =
+                                      await _tv.isPhoneAccountEnabled();
+                                  _updatePermissions();
+                                }
+                              : null,
+                          child: const Text("Open Settings"),
+                        ),
+                      ),
+                    Align(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          _isPhoneAccountEnabled =
+                              await _tv.isPhoneAccountEnabled();
+                          _updatePermissions();
+                          if (_isPhoneAccountEnabled) {
+                            Navigator.pop(context, true);
+                            PermissionState.savePermissionState(
+                                hasMicPermission: _hasMicPermission,
+                                hasReadPhoneStatePermission:
+                                    _hasReadPhoneStatePermission,
+                                hasReadPhoneNumbersPermission:
+                                    _hasReadPhoneNumbersPermission,
+                                hasCallPhonePermission: _hasCallPhonePermission,
+                                hasManageCallsPermission:
+                                    _hasManageCallsPermission,
+                                hasRegisteredPhoneAccount:
+                                    _hasRegisteredPhoneAccount,
+                                isPhoneAccountEnabled: _isPhoneAccountEnabled,
+                                hasIgnoreBatteryOptimizationPermission:
+                                    _hasIgnoreBatteryOptimizationPermission);
+                            return;
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Please grant all permissions")),
+                          );
+                        },
+                        child: Text('Go back'),
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
