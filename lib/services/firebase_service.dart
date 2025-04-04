@@ -42,9 +42,8 @@ class FirebaseService {
 
   /// Get the FCM token
   Future<String?> getFCMToken() async {
-    String? fcmToken = Platform.isIOS
-        ? await FirebaseMessaging.instance.getAPNSToken()
-        : await _storage.getFCMToken() ?? await _firebaseMessaging.getToken();
+    String? fcmToken =
+        await _storage.getFCMToken() ?? await _firebaseMessaging.getToken();
     await _storage.saveFCMToken(fcmToken!);
     // return await _firebaseMessaging.getToken();
     return fcmToken;
