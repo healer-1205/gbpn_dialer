@@ -90,114 +90,117 @@ class _SignInScreenState extends State<SignInScreen> {
         //     },
         //   ),
         // ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  Center(
-                    child: Image.asset(
-                      ImageAssets.logo,
-                      width: 80,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: Text(
-                      StringConstants.loginTitle,
-                      style: AppStyles.textStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Image.asset(
+                        ImageAssets.logo,
+                        width: 80,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.all(36.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Email is required';
-                            }
-                            if (!RegExp(
-                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-                                .hasMatch(value)) {
-                              return 'Enter a valid email';
-                            }
-                            return null;
-                          },
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Text(
+                        StringConstants.loginTitle,
+                        style: AppStyles.textStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
-                        const SizedBox(height: 16.0),
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Password is required';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              // Handle forgot password
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.all(36.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              border: OutlineInputBorder(),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Email is required';
+                              }
+                              if (!RegExp(
+                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+                                  .hasMatch(value)) {
+                                return 'Enter a valid email';
+                              }
+                              return null;
                             },
-                            child: const Text('Forgot Password?'),
                           ),
-                        ),
-                        const SizedBox(height: 16.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _isLoading
-                                ? const CircularProgressIndicator()
-                                : ElevatedButton(
-                                    onPressed: _validateAndLogin,
-                                    style: AppStyles.elevatedButtonStyle(
-                                      backgroundColor: Colors.deepPurpleAccent,
-                                      foregroundColor: Colors.white,
-                                      borderRadius: 12.0,
-                                      horizontalPadding:
-                                          context.screenWidth / 3.8,
-                                    ),
-                                    child: const Text(
-                                      "Login",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                          const SizedBox(height: 16.0),
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Password',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Password is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16.0),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                // Handle forgot password
+                              },
+                              child: const Text('Forgot Password?'),
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _isLoading
+                                  ? const CircularProgressIndicator()
+                                  : ElevatedButton(
+                                      onPressed: _validateAndLogin,
+                                      style: AppStyles.elevatedButtonStyle(
+                                        backgroundColor:
+                                            Colors.deepPurpleAccent,
+                                        foregroundColor: Colors.white,
+                                        borderRadius: 12.0,
+                                        horizontalPadding:
+                                            context.screenWidth / 3.8,
+                                      ),
+                                      child: const Text(
+                                        "Login",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
