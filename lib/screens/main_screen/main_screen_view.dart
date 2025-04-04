@@ -83,6 +83,16 @@ class _MainScreenViewState extends State<MainScreenView> {
   Future<void> _initializeTwilio() async {
     try {
       final deviceToken = await StorageService().getFCMToken();
+      if (deviceToken == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("FCM Token not found"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
       if (!mounted) return;
       await _twilioService.initialize(twilioToken, deviceToken!, context);
 
