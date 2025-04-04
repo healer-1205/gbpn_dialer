@@ -43,7 +43,7 @@ class FirebaseService {
   /// Get the FCM token
   Future<String?> getFCMToken() async {
     String? apnToken = await _firebaseMessaging.getAPNSToken();
-    if (apnToken == null) {
+    if (apnToken == null && Platform.isIOS) {
       return null;
     }
     String? fcmToken =
