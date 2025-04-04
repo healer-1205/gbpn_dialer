@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:gbpn_dealer/models/auth_response.dart';
 import 'api_service.dart';
@@ -11,6 +13,7 @@ class AuthService {
     Response response = await _api.post('/mobile-app/login', {
       "email": email,
       "password": password,
+      'device_type': Platform.isAndroid ? 'android' : 'ios',
     });
 
     if (response.statusCode == 200) {
