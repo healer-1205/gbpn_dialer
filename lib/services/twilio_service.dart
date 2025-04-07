@@ -38,6 +38,7 @@ class TwilioService {
   Future<void> initialize(
       String accessToken, String deviceToken, BuildContext context) async {
     try {
+      log("deviceToken: $deviceToken");
       await TwilioVoice.instance.setTokens(
         accessToken: accessToken,
         deviceToken: deviceToken,
@@ -51,7 +52,9 @@ class TwilioService {
 
       TwilioVoice.instance.setDefaultCallerName("Unknown");
 
-      _setupListeners(context);
+      if (context.mounted) {
+        _setupListeners(context);
+      }
       log("Twilio Initialized Successfully");
     } catch (e) {
       log("Twilio Initialization Failed: $e");
