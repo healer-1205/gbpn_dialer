@@ -110,9 +110,12 @@ class TwilioService {
     _isCallConnected = false;
     try {
       await TwilioVoice.instance.call.place(
-        from: from, // Twilio Number 15093611979
-        to: toNumber.length != 10 ? toNumber : '+1$toNumber', //18042221111
-      );
+          from: from,
+          to: toNumber.length != 10 ? toNumber : '+1$toNumber',
+          extraOptions: {
+            "fromNumber": from,
+            "toNumber": toNumber.length != 10 ? toNumber : '+1$toNumber',
+          });
       log("Calling $toNumber...");
     } catch (e) {
       log("Failed to make call: $e");
