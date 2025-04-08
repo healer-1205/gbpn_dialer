@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -94,7 +95,7 @@ class _MainScreenViewState extends State<MainScreenView> {
         return;
       }
       if (!mounted) return;
-      await _twilioService.initialize(twilioToken, deviceToken!, context);
+      await _twilioService.initialize(twilioToken, deviceToken, context);
 
       _setupCallListeners();
       _permissionRequiredDialog();
@@ -115,10 +116,10 @@ class _MainScreenViewState extends State<MainScreenView> {
           }
           break;
         case CallEvent.connected:
-          print('Call Connected');
+          log('Call Connected');
           break;
         case CallEvent.incoming:
-          print('Incoming call');
+          log('Incoming call');
           break;
         default:
           break;

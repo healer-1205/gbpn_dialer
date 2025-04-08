@@ -38,11 +38,13 @@ class TwilioService {
   Future<void> initialize(
       String accessToken, String deviceToken, BuildContext context) async {
     try {
+      log("APNS Token: $deviceToken");
       await TwilioVoice.instance.setTokens(
         accessToken: accessToken,
         deviceToken: deviceToken,
       );
       TwilioVoice.instance.setOnDeviceTokenChanged((token) async {
+        log("Device token changed: $token");
         await TwilioVoice.instance.setTokens(
           accessToken: accessToken,
           deviceToken: token,
@@ -51,7 +53,9 @@ class TwilioService {
 
       TwilioVoice.instance.setDefaultCallerName("Unknown");
 
-      _setupListeners(context);
+      if (context.mounted) {
+        _setupListeners(context);
+      }
       log("Twilio Initialized Successfully");
     } catch (e) {
       log("Twilio Initialization Failed: $e");
@@ -106,9 +110,12 @@ class TwilioService {
     _isCallConnected = false;
     try {
       await TwilioVoice.instance.call.place(
-        from: from, // Twilio Number 15093611979
-        to: toNumber.length != 10 ? toNumber : '+1$toNumber', //18042221111
-      );
+          from: from,
+          to: toNumber.length != 10 ? toNumber : '+1$toNumber',
+          extraOptions: {
+            "fromNumber": from,
+            "toNumber": toNumber.length != 10 ? toNumber : '+1$toNumber',
+          });
       log("Calling $toNumber...");
     } catch (e) {
       log("Failed to make call: $e");

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -43,15 +44,22 @@ class FirebaseService {
   /// Get the FCM token
   Future<String?> getFCMToken() async {
     String? apnToken = await _firebaseMessaging.getAPNSToken();
-    if (apnToken == null) {
+    if (apnToken == null && Platform.isIOS) {
       return null;
     }
+    final String? androidToken = await _storage.getFCMToken();
+    final String? iosToken = await _firebaseMessaging.getAPNSToken();
+    log("isIos: $iosToken");
+    log("isAndroid: $androidToken");
+    // String? fcmToken = Platform.isAndroid
+    //     ? await _storage.getFCMToken()
+    //     : await _firebaseMessaging.getAPNSToken();
     String? fcmToken =
         await _storage.getFCMToken() ?? await _firebaseMessaging.getToken();
-    if (fcmToken == null) {
+    if (fcmToken == null || fcmToken == "") {
       return null;
     }
-    await _storage.saveFCMToken(fcmToken!);
+    await _storage.saveFCMToken(fcmToken);
     // return await _firebaseMessaging.getToken();
     return fcmToken;
   }
