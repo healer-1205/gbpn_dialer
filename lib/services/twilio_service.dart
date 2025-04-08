@@ -38,12 +38,12 @@ class TwilioService {
   Future<void> initialize(
       String accessToken, String deviceToken, BuildContext context) async {
     try {
-      log("deviceToken: $deviceToken");
       await TwilioVoice.instance.setTokens(
         accessToken: accessToken,
         deviceToken: deviceToken,
       );
       TwilioVoice.instance.setOnDeviceTokenChanged((token) async {
+        log("Device token changed: $token");
         await TwilioVoice.instance.setTokens(
           accessToken: accessToken,
           deviceToken: token,

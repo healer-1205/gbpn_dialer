@@ -48,15 +48,12 @@ class FirebaseService {
       return null;
     }
     final String? androidToken = await _storage.getFCMToken();
-    final String? iosToken = await _firebaseMessaging.getToken();
+    final String? iosToken = await _firebaseMessaging.getAPNSToken();
     log("isIos: $iosToken");
     log("isAndroid: $androidToken");
-    String? fcmToken = "";
-    if (Platform.isAndroid) {
-      fcmToken = await _storage.getFCMToken();
-    } else if (Platform.isIOS) {
-      fcmToken = await _firebaseMessaging.getToken();
-    }
+    String? fcmToken = Platform.isAndroid
+        ? await _storage.getFCMToken()
+        : await _firebaseMessaging.getAPNSToken();
     // String? fcmToken =
     //     await _storage.getFCMToken() ?? await _firebaseMessaging.getToken();
     if (fcmToken == null || fcmToken == "") {
