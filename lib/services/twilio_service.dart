@@ -4,6 +4,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:gbpn_dealer/screens/incoming_screen/incoming_call_screen.dart';
 import 'package:twilio_voice/twilio_voice.dart';
 
 class TwilioService {
@@ -182,13 +183,13 @@ class TwilioService {
 
   /// Show Incoming Call Screen
   void showIncomingCallScreen(BuildContext context) {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) =>
-    //         IncomingCallScreen(callerName: "GBPN Dialer Testing"),
-    //   ),
-    // );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            IncomingCallScreen(callerName: "GBPN Dialer"),
+      ),
+    );
   }
 
   /// Answer the Call
