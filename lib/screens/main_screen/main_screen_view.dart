@@ -84,7 +84,8 @@ class _MainScreenViewState extends State<MainScreenView> {
   /// Initialize Twilio Service
   Future<void> _initializeTwilio() async {
     try {
-      final deviceToken = await FirebaseService().getFCMToken();
+      final deviceToken =
+          Platform.isIOS ? "don't need" : await FirebaseService().getFCMToken();
       if (deviceToken == null) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

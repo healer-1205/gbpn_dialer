@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
@@ -42,13 +43,13 @@ class TwilioService {
       log("APNS Token: $deviceToken");
       await TwilioVoice.instance.setTokens(
         accessToken: accessToken,
-        deviceToken: deviceToken,
+        deviceToken: Platform.isIOS ? null : deviceToken,
       );
       TwilioVoice.instance.setOnDeviceTokenChanged((token) async {
         log("Device token changed: $token");
         await TwilioVoice.instance.setTokens(
           accessToken: accessToken,
-          deviceToken: token,
+          deviceToken: Platform.isIOS ? null : token,
         );
       });
 
@@ -186,8 +187,7 @@ class TwilioService {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            IncomingCallScreen(callerName: "GBPN Dialer"),
+        builder: (context) => IncomingCallScreen(callerName: "GBPN Dialer"),
       ),
     );
   }
