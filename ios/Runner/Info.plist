@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Gbpn Dealer</string>
+	<string>Gbpn Dialer</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -57,8 +57,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-    <key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
-    
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+  <key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.twilio.voice.background-task</string>
+	</array>
+	<key>NSContactsUsageDescription</key>
+	<string>We need access to your contacts for dialing.</string>
 </dict>
 </plist>
