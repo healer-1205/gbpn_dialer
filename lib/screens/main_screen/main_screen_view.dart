@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gbpn_dealer/screens/dialpad/active_number_reminder_dialog.dart';
 import 'package:gbpn_dealer/screens/out_going_call/out_going_call.dart';
 import 'package:gbpn_dealer/screens/permissions/permissions_block.dart';
+import 'package:gbpn_dealer/services/firebase_service.dart';
 import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:gbpn_dealer/services/twilio_service.dart';
 import 'package:gbpn_dealer/utils/utils.dart';
@@ -83,7 +84,7 @@ class _MainScreenViewState extends State<MainScreenView> {
   /// Initialize Twilio Service
   Future<void> _initializeTwilio() async {
     try {
-      final deviceToken = await StorageService().getFCMToken();
+      final deviceToken = await FirebaseService().getFCMToken();
       if (deviceToken == null) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
