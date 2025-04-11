@@ -144,6 +144,9 @@ class TwilioService {
         case CallEvent.incoming:
           log("Incoming Call detected!");
           if (context.mounted) {
+            if (Platform.isIOS) {
+              SystemChannels.lifecycle.send('AppLifecycleState.resumed');
+            }
             showIncomingCallScreen(context);
           }
           break;
