@@ -18,7 +18,6 @@ class TwilioService {
   bool _isPlaying = false;
   bool _isCallConnected = false;
 
-  /// Singleton instance
   factory TwilioService() {
     return _instance;
   }
@@ -161,9 +160,6 @@ class TwilioService {
           _playEndCallSound(); // Play end call sound
           break;
         case CallEvent.ringing:
-          if (context.mounted && Platform.isIOS) {
-            showIncomingCallScreen(context);
-          }
           _isPlaying = true;
           log("Phone is Ringing!");
           _playRingtone(); // Play ringtone when phone is ringing
@@ -189,22 +185,12 @@ class TwilioService {
     });
   }
 
-  ActiveCall? get activeCall => TwilioVoice.instance.call.activeCall;
-
   /// Show Incoming Call Screen
   void showIncomingCallScreen(BuildContext context) {
-    if (TwilioVoice.instance.call.activeCall == null ||
-        activeCall!.callDirection == CallDirection.outgoing) {
-      return;
-    }
-
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => IncomingCallScreen(
-            twilioService: this,
-            callerName:
-                TwilioVoice.instance.call.activeCall?.from ?? 'Unknown'),
+        builder: (context) => IncomingCallScreen(callerName: "GBPN Dialer"),
       ),
     );
   }
