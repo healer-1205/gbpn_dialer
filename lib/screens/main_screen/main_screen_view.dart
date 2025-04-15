@@ -4,12 +4,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gbpn_dealer/screens/dialpad/active_number_reminder_dialog.dart';
+import 'package:gbpn_dealer/screens/incoming_screen/incoming_call_screen.dart'
+    show IncomingCallScreen;
 import 'package:gbpn_dealer/screens/out_going_call/out_going_call.dart';
 import 'package:gbpn_dealer/screens/permissions/permissions_block.dart';
 import 'package:gbpn_dealer/services/firebase_service.dart';
 import 'package:gbpn_dealer/services/storage_service.dart';
 import 'package:gbpn_dealer/services/twilio_service.dart';
 import 'package:gbpn_dealer/utils/utils.dart';
+import 'package:twilio_voice/models/active_call.dart' show CallDirection;
 import 'package:twilio_voice/models/call_event.dart';
 
 import '../contacts/contact_screen.dart';
@@ -123,10 +126,32 @@ class _MainScreenViewState extends State<MainScreenView> {
         case CallEvent.incoming:
           log('Incoming call');
           break;
+        case CallEvent.ringing:
+          if (Platform.isIOS) {
+            showIncomingCallScreen(context);
+          }
+          break;
         default:
           break;
       }
     });
+  }
+
+  /// Show Incoming Call Screen
+  void showIncomingCallScreen(BuildContext context) {
+    if (_twilioService.activeCall == null ||
+        _twilioService.activeCall!.callDirection == CallDirection.outgoing) {
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IncomingCallScreen(
+            twilioService: _twilioService,
+            callerName: _twilioService.activeCall?.from ?? 'Unknown'),
+      ),
+    );
   }
 
   // Usage example:
