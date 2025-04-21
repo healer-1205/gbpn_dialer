@@ -1,22 +1,27 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:gbpn_dealer/main.dart';
 import 'package:gbpn_dealer/screens/incoming_screen/incoming_call_screen.dart';
+import 'package:gbpn_dealer/screens/incoming_screen/ongoing_call_screen.dart';
 import 'package:twilio_voice/twilio_voice.dart';
 
 class TwilioService {
   static final TwilioService _instance = TwilioService._internal();
   late Uint8List bimData;
 
-  // Sound players
   final FlutterSoundPlayer _soundPlayer = FlutterSoundPlayer();
   final FlutterSoundPlayer _endCallSoundPlayer = FlutterSoundPlayer();
   bool _isPlaying = false;
   bool _isCallConnected = false;
+  bool _isNavigating = false;
+  bool get isCallConnected => _isCallConnected;
 
   factory TwilioService() {
     return _instance;
@@ -26,34 +31,54 @@ class TwilioService {
     _initSoundPlayers();
   }
 
-  /// Initialize the sound players
+  Future<void> handleIncomingCallFromTerminated(
+      Map<String, dynamic> callData) async {
+    log("Handling call from terminated state: $callData");
+
+    if (navigatorKey.currentContext != null) {
+      showIncomingCallScreen(navigatorKey.currentContext!);
+    } else {
+      Timer.periodic(Duration(milliseconds: 100), (timer) {
+        if (navigatorKey.currentContext != null) {
+          showIncomingCallScreen(navigatorKey.currentContext!);
+          timer.cancel();
+        }
+      });
+    }
+  }
+
   Future<void> _initSoundPlayers() async {
     await _soundPlayer.openPlayer();
     await _endCallSoundPlayer.openPlayer();
     bimData = await getAssetData('assets/sounds/phone-call.mp3');
   }
 
-  /// Stream for call events
   Stream<CallEvent> get callEvents => TwilioVoice.instance.callEventsListener;
 
-  /// Initialize Twilio with tokens
   Future<void> initialize(
       String accessToken, String deviceToken, BuildContext context) async {
     try {
       log("APNS Token: $deviceToken");
       await TwilioVoice.instance.setTokens(
         accessToken: accessToken,
-        deviceToken: Platform.isIOS ? null : deviceToken,
+        deviceToken: deviceToken,
       );
+
+      await setupPushNotifications();
+
       TwilioVoice.instance.setOnDeviceTokenChanged((token) async {
         log("Device token changed: $token");
         await TwilioVoice.instance.setTokens(
           accessToken: accessToken,
-          deviceToken: Platform.isIOS ? null : token,
+          deviceToken: token,
         );
       });
 
       TwilioVoice.instance.setDefaultCallerName("Unknown");
+
+      _isCallConnected = false;
+      _isPlaying = false;
+      _isNavigating = false;
 
       if (context.mounted) {
         _setupListeners(context);
@@ -69,7 +94,6 @@ class TwilioService {
     return asset.buffer.asUint8List();
   }
 
-  /// Play ringtone sound
   Future<void> _playRingtone() async {
     if (!_isPlaying) {
       return;
@@ -81,7 +105,7 @@ class TwilioService {
         whenFinished: () async {
           await Future.delayed(Duration(seconds: 2));
           _playRingtone();
-          _isPlaying = true; // Restart the ringtone when it finishes
+          _isPlaying = true;
         },
       );
 
@@ -91,7 +115,6 @@ class TwilioService {
     }
   }
 
-  /// Stop ringtone sound
   Future<void> _stopRingtone() async {
     if (_isPlaying) {
       try {
@@ -106,7 +129,6 @@ class TwilioService {
     }
   }
 
-  /// Make a call
   Future<void> makeCall(String from, String toNumber) async {
     _isPlaying = false;
     _isCallConnected = false;
@@ -124,7 +146,6 @@ class TwilioService {
     }
   }
 
-  /// Check if token is expired
   bool isTokenExpired(String token) {
     try {
       final jwt = JWT.decode(token);
@@ -136,41 +157,65 @@ class TwilioService {
     }
   }
 
-  /// Setup listeners for Twilio events
   void _setupListeners(BuildContext context) {
-    // Listen for Twilio Call Events
     TwilioVoice.instance.callEventsListener.listen((event) {
       switch (event) {
         case CallEvent.incoming:
           log("Incoming Call detected!");
           if (context.mounted) {
-            if (Platform.isIOS) {
-              SystemChannels.lifecycle.send('AppLifecycleState.resumed');
-            }
             showIncomingCallScreen(context);
           }
           break;
         case CallEvent.connected:
           log("Call Connected!");
-          _stopRingtone(); // Stop ringtone when call is connected
+          _isCallConnected = true;
+          _stopRingtone();
+
+          if (context.mounted && !_isNavigating) {
+            _isNavigating = true;
+
+            Future.microtask(() {
+              if (context.mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const TwilioOngoingCallScreen()),
+                ).then((_) {
+                  _isNavigating = false;
+                });
+              } else {
+                _isNavigating = false;
+              }
+            });
+          }
           break;
         case CallEvent.callEnded:
           log("Call Ended!");
-          _stopRingtone(); // Stop ringtone when call ends
-          _playEndCallSound(); // Play end call sound
+          _isCallConnected = false;
+          _stopRingtone();
+          _playEndCallSound();
+
+          Navigator.of(navigatorKey.currentContext!)
+              .pushNamedAndRemoveUntil('/main', (route) => false)
+              .then((_) => _isNavigating = false)
+              .catchError((error) {
+            log("Navigation error: $error");
+            _isNavigating = false;
+          });
           break;
         case CallEvent.ringing:
           _isPlaying = true;
           log("Phone is Ringing!");
-          _playRingtone(); // Play ringtone when phone is ringing
+          _playRingtone();
           break;
         case CallEvent.reconnecting:
           log("Reconnecting Call...");
           break;
         case CallEvent.declined:
           log("Call Declined");
-          _stopRingtone(); // Stop ringtone when call is declined
-          _playEndCallSound(); // Play end call sound when call is declined
+          _isCallConnected = false;
+          _stopRingtone();
+          _playEndCallSound();
           break;
         case CallEvent.speakerOn:
         case CallEvent.speakerOff:
@@ -185,25 +230,85 @@ class TwilioService {
     });
   }
 
-  /// Show Incoming Call Screen
-  void showIncomingCallScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => IncomingCallScreen(callerName: "GBPN Dialer"),
-      ),
+  Future<void> setupPushNotifications() async {
+    final messaging = FirebaseMessaging.instance;
+    await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
     );
+
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) {
+      if (message != null) {
+        log("App opened from terminated state due to push notification");
+
+        _handlePushNotification(message.data);
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      log("Push notification received while app is in foreground");
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      log("App opened from background state due to push notification");
+
+      _handlePushNotification(message.data);
+    });
+
+    final fcmToken = await messaging.getToken();
+    log("FCM Token: $fcmToken");
+
+    if (Platform.isAndroid) {}
   }
 
-  /// Answer the Call
+  void _handlePushNotification(Map<String, dynamic> data) {
+    log("Handling push notification data: $data");
+
+    if (data.containsKey('twi_message_type') &&
+        data['twi_message_type'] == 'twilio.voice.call') {
+      if (navigatorKey.currentContext != null) {
+        showIncomingCallScreen(navigatorKey.currentContext!);
+      } else {}
+    }
+  }
+
+  void showIncomingCallScreen(BuildContext context) {
+    if (context.mounted && !_isNavigating) {
+      _isNavigating = true;
+
+      Future.microtask(() {
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const TwilioIncomingCallScreen(),
+            ),
+          ).then((_) {
+            _isNavigating = false;
+          });
+        } else {
+          _isNavigating = false;
+        }
+      });
+    }
+  }
+
   Future<void> answerCall() async {
     await TwilioVoice.instance.call.answer();
+    _isCallConnected = true;
   }
 
-  /// Decline the Call
   Future<void> hangUpCall() async {
-    await TwilioVoice.instance.call.hangUp();
-    await _stopRingtone(); // Ensure ringtone is stopped when call is declined
+    try {
+      await TwilioVoice.instance.call.hangUp();
+      _isCallConnected = false;
+      await _stopRingtone();
+    } catch (e) {
+      log("Error hanging up call: $e");
+    }
   }
 
   Future<void> toggleSpeaker(bool value) async {
@@ -222,7 +327,6 @@ class TwilioService {
     await TwilioVoice.instance.call.sendDigits(value);
   }
 
-  /// Play end call sound
   Future<void> _playEndCallSound() async {
     try {
       var endCallData = await getAssetData('assets/sounds/end-call.mp3');
@@ -236,7 +340,6 @@ class TwilioService {
     }
   }
 
-  /// Dispose resources
   Future<void> dispose() async {
     await _stopRingtone();
     await _soundPlayer.closePlayer();
