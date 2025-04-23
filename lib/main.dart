@@ -43,6 +43,11 @@ void main() async {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
 
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   bool isFirstLaunch = await _checkFirstLaunch();
   runApp(MyApp(initialRoute: isFirstLaunch ? '/intro' : '/splash'));
 }
