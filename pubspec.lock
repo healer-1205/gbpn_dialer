@@ -664,10 +664,11 @@ packages:
   twilio_voice:
     dependency: "direct main"
     description:
-      name: twilio_voice
-      sha256: "86b53b17dc0c35a2e5baa9def4f8ea3e25d401cf2bd2bf44ea7f3375d7dcc980"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: space
+      resolved-ref: "65724bc6621b833f5e822b4d49368945de8676da"
+      url: "https://github.com/AndreiMisiukevich/twilio_voice.git"
+    source: git
     version: "0.2.2"
   typed_data:
     dependency: transitive

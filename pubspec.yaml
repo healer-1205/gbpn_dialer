@@ -45,7 +45,11 @@ dependencies:
   # notification
   firebase_messaging: ^15.2.4
 
-  twilio_voice: ^0.2.2
+  twilio_voice:
+    git:
+      url: https://github.com/AndreiMisiukevich/twilio_voice.git
+      ref: space
+
 
   # to show toast
   fluttertoast: ^8.2.12
